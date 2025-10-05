@@ -96,10 +96,22 @@ export const TASK_SUB_TABS: SubTabConfiguration[] = [
 
 export const GROCERY_SUB_TABS: SubTabConfiguration[] = [
   {
-    key: "shopping",
-    title: "Shopping List",
+    key: "cart",
+    title: "Cart",
     icon: "🛒",
-    description: "Create shopping lists",
+    description: "Items to buy",
+  },
+  {
+    key: "active",
+    title: "Active",
+    icon: "📋",
+    description: "Current shopping lists",
+  },
+  {
+    key: "completed",
+    title: "Completed",
+    icon: "✅",
+    description: "Completed shopping lists",
   },
 ];
 

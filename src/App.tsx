@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Board from "./components/Board";
 import { GROCERY_CATEGORIES } from "./config/categories";
 import {
@@ -53,7 +53,7 @@ export default function App() {
     () => (localStorage.getItem("dayboard.selected") as BoardKey) || "grocery"
   );
   const [subTab, setSubTab] = useState<string>(
-    () => localStorage.getItem("dayboard.subtab") || "shopping"
+    () => localStorage.getItem("dayboard.subtab") || "cart"
   );
   const [isDark, setIsDark] = useState<boolean>(
     () => localStorage.getItem("dayboard.theme") === "dark"
