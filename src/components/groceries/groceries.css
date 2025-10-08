@@ -136,7 +136,7 @@
   border-radius: 4px;
   background: #fff;
   color: #333;
-  font-size: 14px;
+  font-size: 13px;
   font-family: "Trebuchet MS", Trebuchet, Arial, sans-serif;
   min-width: 180px;
 }
@@ -647,13 +647,14 @@
 .inventory-table-container {
   margin-top: 20px;
   overflow-x: auto;
+  overflow-y: auto;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   width: 100% !important;
   max-width: 100% !important;
-  min-height: 70vh;
-  height: auto;
+  height: 420px;
+  max-height: 420px;
   flex: 1;
   margin-left: 0 !important;
   margin-right: 0 !important;
@@ -682,22 +683,34 @@
 .inventory-table thead th {
   text-align: left !important;
   background: #f8f9fa !important;
-  padding: 16px 20px !important;
+  padding: 8px 12px !important;
   font-weight: 600 !important;
   color: #666 !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
   border-bottom: 1px solid #e5e5e5 !important;
   white-space: nowrap !important;
+  height: 32px !important;
 }
 
 .inventory-table-container .inventory-table tbody td {
   text-align: left !important;
-  padding: 16px 20px !important;
+  padding: 6px 12px !important;
   border-bottom: 1px solid #f0f0f0 !important;
   color: #333 !important;
   vertical-align: middle !important;
+  height: 28px !important;
+  font-size: 13px !important;
+}
+
+/* Alternating row colors like Excel */
+.inventory-table tbody tr:nth-child(even) {
+  background: #f9f9f9 !important;
+}
+
+.inventory-table tbody tr:nth-child(odd) {
+  background: #ffffff !important;
 }
 
 /* Dark theme overrides */
@@ -712,14 +725,22 @@
   color: #e0e0e0 !important;
 }
 
-/* OLD STYLES REMOVED - USING HIGHER SPECIFICITY STYLES ABOVE */
+/* Dark theme alternating rows */
+.dark-theme .inventory-table tbody tr:nth-child(even) {
+  background: #3a3a3a !important;
+}
 
+.dark-theme .inventory-table tbody tr:nth-child(odd) {
+  background: #404040 !important;
+}
+
+/* Hover effects */
 .inventory-table tbody tr:hover {
-  background: #f8f9fa;
+  background: #e8f4fd !important;
 }
 
 .dark-theme .inventory-table tbody tr:hover {
-  background: #4a4a4a;
+  background: #4a5568 !important;
 }
 
 .inventory-table tbody tr:last-child td {
@@ -751,7 +772,7 @@
 
 .inventory-table .item-category {
   color: #666;
-  font-size: 14px;
+  font-size: 12px;
   min-width: 120px;
 }
 
@@ -761,7 +782,7 @@
 
 .inventory-table .item-date {
   color: #666;
-  font-size: 14px;
+  font-size: 12px;
   min-width: 100px;
 }
 
@@ -773,18 +794,24 @@
   text-align: center;
   white-space: nowrap;
   width: 100px;
+  min-width: 100px;
 }
 
 .inventory-table .action-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
-  padding: 6px 8px;
-  margin: 0 2px;
-  border-radius: 4px;
+  font-size: 14px;
+  padding: 4px 6px;
+  margin: 0 1px;
+  border-radius: 3px;
   transition: all 0.15s ease;
   opacity: 0.7;
+  min-width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .inventory-table .action-btn:hover {
@@ -888,4 +915,137 @@
 
 .dark-theme .category-summary p {
   color: #e0e0e0;
+}
+
+/* Quantity and Cost Input Styling */
+.quantity-input,
+.cost-input {
+  flex: 0 0 120px !important;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  font-family: "Trebuchet MS", Trebuchet, Arial, sans-serif;
+}
+
+.dark-theme .quantity-input,
+.dark-theme .cost-input {
+  background: #404040;
+  border: 1px solid #555;
+  color: #e0e0e0;
+}
+
+.quantity-input:focus,
+.cost-input:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.1);
+}
+
+.dark-theme .quantity-input:focus,
+.dark-theme .cost-input:focus {
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.1);
+}
+
+/* Category label styling for smaller font size */
+.item-category {
+  font-size: 12px;
+}
+
+/* Sub-tab labels styling */
+.sub-tabs .tab {
+  font-size: 13px;
+}
+
+/* Category headers in boards */
+h3 {
+  font-size: 18px;
+}
+
+/* Pagination styling */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+}
+
+.dark-theme .pagination-container {
+  background: #555;
+  border-color: #666;
+  color: #e0e0e0;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.dark-theme .pagination-info {
+  color: #b0b0b0;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-btn {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #007acc;
+  color: white;
+  border-color: #007acc;
+}
+
+.pagination-btn:disabled {
+  background: #f5f5f5;
+  color: #ccc;
+  cursor: not-allowed;
+  border-color: #eee;
+}
+
+.dark-theme .pagination-btn {
+  background: #404040;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+.dark-theme .pagination-btn:hover:not(:disabled) {
+  background: #4dabf7;
+  border-color: #4dabf7;
+}
+
+.dark-theme .pagination-btn:disabled {
+  background: #2a2a2a;
+  color: #666;
+  border-color: #444;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 4px;
 }

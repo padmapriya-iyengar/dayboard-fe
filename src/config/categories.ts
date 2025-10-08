@@ -8,57 +8,81 @@ export interface Category {
 
 export const GROCERY_CATEGORIES: Category[] = [
   {
-    value: "fruits",
-    label: "Fruits",
-    icon: "🍎",
-    description: "Fresh and dried fruits",
+    value: "spices",
+    label: "Spices",
+    icon: "",
+    description: "Spices and seasonings",
   },
   {
-    value: "vegetables",
-    label: "Vegetables",
-    icon: "🥕",
-    description: "Fresh vegetables and greens",
+    value: "sweet_confectionary",
+    label: "Sweet & Confectionary",
+    icon: "",
+    description: "Sweets, chocolates and confectionary items",
   },
   {
-    value: "dairy",
-    label: "Dairy Products",
-    icon: "🥛",
-    description: "Milk, cheese, yogurt and dairy items",
+    value: "pulses",
+    label: "Pulses",
+    icon: "",
+    description: "Lentils, beans and pulses",
   },
   {
-    value: "grains",
-    label: "Grains & Cereals",
-    icon: "🌾",
-    description: "Rice, wheat, oats and grain products",
+    value: "flour",
+    label: "Flour",
+    icon: "",
+    description: "Flour and grain powders",
   },
   {
-    value: "snacks",
-    label: "Snacks",
-    icon: "🍿",
-    description: "Chips, crackers and snack foods",
+    value: "oil_ghee",
+    label: "Oil & Ghee",
+    icon: "",
+    description: "Cooking oils, ghee and fats",
   },
   {
-    value: "beverages",
-    label: "Beverages",
-    icon: "🥤",
-    description: "Drinks, juices and beverages",
+    value: "rice_breakfast",
+    label: "Rice & Breakfast",
+    icon: "",
+    description: "Rice, breakfast cereals and grains",
   },
   {
-    value: "condiments",
-    label: "Condiments & Spices",
-    icon: "🧂",
-    description: "Sauces, spices and seasonings",
+    value: "whole_spices",
+    label: "Whole Spices",
+    icon: "",
+    description: "Whole spices and herbs",
   },
   {
-    value: "household",
-    label: "Household Items",
-    icon: "🧽",
-    description: "Cleaning supplies and household goods",
+    value: "cleaning",
+    label: "Cleaning",
+    icon: "",
+    description: "Cleaning supplies and detergents",
   },
   {
-    value: "other",
-    label: "Other",
-    icon: "📦",
+    value: "personal_care",
+    label: "Personal Care",
+    icon: "",
+    description: "Personal care and hygiene products",
+  },
+  {
+    value: "pooja_items",
+    label: "Pooja Items",
+    icon: "",
+    description: "Religious and pooja items",
+  },
+  {
+    value: "dry_fruits",
+    label: "Dry Fruits",
+    icon: "",
+    description: "Dry fruits and nuts",
+  },
+  {
+    value: "fruits_vegetables",
+    label: "Fruits & Vegetables",
+    icon: "",
+    description: "Fresh fruits and vegetables",
+  },
+  {
+    value: "others",
+    label: "Others",
+    icon: "",
     description: "Miscellaneous items",
   },
 ];
@@ -75,5 +99,5 @@ export const getCategoryLabel = (value: string): string => {
 
 export const getCategoryIcon = (value: string): string => {
   const category = getCategoryByValue(value);
-  return category?.icon || "📦";
+  return category?.icon || "";
 };

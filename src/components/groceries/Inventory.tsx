@@ -4,11 +4,14 @@ import {
   getCategoryLabel,
   type Category,
 } from "../../config/categories";
+import "./groceries.css";
 
 interface InventoryItem {
   id: number;
   name: string;
   category: string;
+  quantity: number;
+  cost: number;
   added: string;
 }
 
@@ -24,6 +27,8 @@ function Inventory() {
   );
   const [itemName, setItemName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [quantity, setQuantity] = useState<number>(1);
+  const [cost, setCost] = useState<number>(0);
 
   const addInventoryItem = () => {
     if (!itemName.trim() || !selectedCategory) return;
@@ -34,6 +39,8 @@ function Inventory() {
         id: Date.now(),
         name: itemName.trim(),
         category: selectedCategory,
+        quantity: quantity,
+        cost: cost,
         added: new Date().toISOString(),
       },
     ];
@@ -41,6 +48,8 @@ function Inventory() {
     localStorage.setItem("dayboard.inventory", JSON.stringify(next));
     setItemName("");
     setSelectedCategory("");
+    setQuantity(1);
+    setCost(0);
   };
 
   const removeInventoryItem = (id: number) => {
@@ -69,6 +78,26 @@ function Inventory() {
               </option>
             ))}
           </select>
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value) || 1)}
+            placeholder="Quantity"
+            min="1"
+            step="1"
+            className="quantity-input"
+            title="Enter quantity"
+          />
+          <input
+            type="number"
+            value={cost}
+            onChange={(e) => setCost(Number(e.target.value) || 0)}
+            placeholder="Cost (£)"
+            min="0"
+            step="0.01"
+            className="cost-input"
+            title="Enter cost in pounds"
+          />
           <button
             onClick={addInventoryItem}
             disabled={!itemName.trim() || !selectedCategory}
@@ -87,6 +116,8 @@ function Inventory() {
                 <th>ID</th>
                 <th>NAME</th>
                 <th>CATEGORY</th>
+                <th>QUANTITY</th>
+                <th>COST</th>
                 <th>ADDED ON</th>
                 <th>ACTIONS</th>
               </tr>
@@ -99,10 +130,22 @@ function Inventory() {
                   <td className="item-category">
                     {getCategoryLabel(item.category)}
                   </td>
+                  <td className="item-quantity">{item.quantity}</td>
+                  <td className="item-cost">£{item.cost.toFixed(2)}</td>
                   <td className="item-date">
                     {new Date(item.added).toLocaleDateString("en-GB")}
                   </td>
                   <td className="item-actions">
+                    <button
+                      className="action-btn add-to-cart-btn"
+                      title="Add to Cart"
+                      onClick={() => {
+                        // TODO: Implement add to cart functionality
+                        console.log("Add to cart:", item.id);
+                      }}
+                    >
+                      🛒
+                    </button>
                     <button className="action-btn edit-btn" title="Edit">
                       ✏️
                     </button>
