@@ -3,7 +3,6 @@ import Board from "./components/Board";
 import { GROCERY_CATEGORIES } from "./config/categories";
 import {
   BOARD_CONFIGS,
-  FINANCE_SUB_TABS,
   REMINDER_SUB_TABS,
   TASK_SUB_TABS,
   GROCERY_SUB_TABS,
@@ -21,6 +20,11 @@ interface SubTabItem {
   title: string;
 }
 
+interface Person {
+  id: number;
+  name: string;
+}
+
 type BoardKey =
   | "grocery"
   | "grocery-inventory"
@@ -34,20 +38,6 @@ const BOARDS: BoardItem[] = BOARD_CONFIGS.map((config) => ({
   description: config.description,
 }));
 
-const SUB_TABS: Record<BoardKey, SubTabItem[]> = {
-  grocery: GROCERY_SUB_TABS.map((tab) => ({ key: tab.key, title: tab.title })),
-  "grocery-inventory": GROCERY_CATEGORIES.map((category) => ({
-    key: category.value,
-    title: category.label,
-  })),
-  finance: FINANCE_SUB_TABS.map((tab) => ({ key: tab.key, title: tab.title })),
-  reminder: REMINDER_SUB_TABS.map((tab) => ({
-    key: tab.key,
-    title: tab.title,
-  })),
-  task: TASK_SUB_TABS.map((tab) => ({ key: tab.key, title: tab.title })),
-};
-
 export default function App() {
   const [selected, setSelected] = useState<BoardKey>(
     () => (localStorage.getItem("dayboard.selected") as BoardKey) || "grocery"
@@ -58,6 +48,91 @@ export default function App() {
   const [isDark, setIsDark] = useState<boolean>(
     () => localStorage.getItem("dayboard.theme") === "dark"
   );
+  const [persons, setPersons] = useState<Person[]>([]);
+
+  // Fetch persons from API
+  useEffect(() => {
+    const fetchPersons = async () => {
+      try {
+        const response = await fetch("http://localhost:3002/api/v1/persons");
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log("API Response:", responseData); // Debug log
+
+          // Handle the correct API response structure
+          if (
+            responseData.status === "success" &&
+            responseData.data?.persons &&
+            Array.isArray(responseData.data.persons) &&
+            responseData.data.persons.length > 0
+          ) {
+            // Map the API response to our expected format
+            const personsData = responseData.data.persons.map(
+              (person: any) => ({
+                id: person.Id,
+                name: person.Name,
+              })
+            );
+
+            setPersons(personsData);
+          } else {
+            console.warn(
+              "API response structure is not as expected:",
+              responseData
+            );
+            // Fallback to default persons
+            setPersons([
+              { id: 1, name: "Joshi" },
+              { id: 2, name: "Nandu" },
+            ]);
+          }
+        } else {
+          console.error("Failed to fetch persons, status:", response.status);
+          // Fallback to default persons if API fails
+          setPersons([
+            { id: 1, name: "Joshi" },
+            { id: 2, name: "Nandu" },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching persons:", error);
+        // Fallback to default persons if API fails
+        setPersons([
+          { id: 1, name: "Joshi" },
+          { id: 2, name: "Nandu" },
+        ]);
+      }
+    };
+
+    fetchPersons();
+  }, []);
+
+  // Create dynamic SUB_TABS based on API response
+  const SUB_TABS: Record<BoardKey, SubTabItem[]> = {
+    grocery: GROCERY_SUB_TABS.map((tab) => ({
+      key: tab.key,
+      title: tab.title,
+    })),
+    "grocery-inventory": GROCERY_CATEGORIES.map((category) => ({
+      key: category.value,
+      title: category.label,
+    })),
+    finance:
+      Array.isArray(persons) && persons.length > 0
+        ? persons.map((person) => ({
+            key: person.name.toLowerCase(),
+            title: person.name,
+          }))
+        : [
+            { key: "joshi", title: "Joshi" },
+            { key: "nandu", title: "Nandu" },
+          ],
+    reminder: REMINDER_SUB_TABS.map((tab) => ({
+      key: tab.key,
+      title: tab.title,
+    })),
+    task: TASK_SUB_TABS.map((tab) => ({ key: tab.key, title: tab.title })),
+  };
 
   useEffect(() => {
     localStorage.setItem("dayboard.selected", selected);
@@ -71,13 +146,13 @@ export default function App() {
     localStorage.setItem("dayboard.theme", isDark ? "dark" : "light");
   }, [isDark]);
 
-  // Reset subtab when changing main tab
+  // Reset subtab when changing main tab or when persons are loaded
   useEffect(() => {
     const subTabs = SUB_TABS[selected];
     if (subTabs && subTabs.length > 0) {
       setSubTab(subTabs[0].key);
     }
-  }, [selected]);
+  }, [selected, persons]); // Added persons dependency
 
   return (
     <div

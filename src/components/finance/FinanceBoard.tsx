@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./finance.css";
 
 interface FinanceEntry {
@@ -18,6 +18,36 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   );
   const [desc, setDesc] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
+  const [defaultPerson, setDefaultPerson] = useState<string>("joshi");
+
+  // Fetch persons to get the default person
+  useEffect(() => {
+    const fetchPersons = async () => {
+      try {
+        const response = await fetch("http://localhost:3002/api/v1/persons");
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log("FinanceBoard API Response:", responseData); // Debug log
+
+          // Handle the correct API response structure
+          if (
+            responseData.status === "success" &&
+            responseData.data?.persons &&
+            Array.isArray(responseData.data.persons) &&
+            responseData.data.persons.length > 0
+          ) {
+            // Use the first person's name as default
+            setDefaultPerson(responseData.data.persons[0].Name.toLowerCase());
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching persons:", error);
+        // Keep default as "joshi"
+      }
+    };
+
+    fetchPersons();
+  }, []);
 
   const add = () => {
     const n = parseFloat(amount);
@@ -28,7 +58,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
         id: Date.now(),
         desc: desc.trim(),
         amount: n,
-        type: subTab || "joshi",
+        type: subTab || defaultPerson,
       },
     ];
     setEntries(next);
@@ -43,29 +73,22 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     localStorage.setItem("dayboard.finance", JSON.stringify(next));
   };
 
-  const filteredEntries = entries.filter((e) => e.type === (subTab || "joshi"));
+  const filteredEntries = entries.filter(
+    (e) => e.type === (subTab || defaultPerson)
+  );
   const total = filteredEntries.reduce((s, e) => s + e.amount, 0);
 
   const getTitle = () => {
-    switch (subTab) {
-      case "joshi":
-        return "Joshi's Finances";
-      case "nandu":
-        return "Nandu's Finances";
-      default:
-        return "Joshi's Finances";
-    }
+    if (!subTab) return "Financial Entries";
+    // Capitalize first letter of the person's name
+    const personName = subTab.charAt(0).toUpperCase() + subTab.slice(1);
+    return `${personName}'s Finances`;
   };
 
   const getDescription = () => {
-    switch (subTab) {
-      case "joshi":
-        return "financial entries for Joshi";
-      case "nandu":
-        return "financial entries for Nandu";
-      default:
-        return "financial entries for Joshi";
-    }
+    if (!subTab) return "financial entries";
+    const personName = subTab.charAt(0).toUpperCase() + subTab.slice(1);
+    return `financial entries for ${personName}`;
   };
 
   return (
