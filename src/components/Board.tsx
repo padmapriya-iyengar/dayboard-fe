@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { GroceryBoard } from "./groceries";
+import { FinanceBoard } from "./finance";
 import { GROCERY_CATEGORIES, getCategoryByValue } from "../config/categories";
 
 // Type definitions
@@ -13,13 +14,6 @@ interface InventoryItem {
   name: string;
   category: string;
   added: string;
-}
-
-interface FinanceEntry {
-  id: number;
-  desc: string;
-  amount: number;
-  type: string;
 }
 
 interface ReminderItem {
@@ -368,85 +362,6 @@ function GroceryInventoryBoard({ subTab }: GroceryInventoryBoardProps) {
           </p>
         </div>
       )}
-    </div>
-  );
-}
-
-interface FinanceBoardProps {
-  subTab?: string;
-}
-
-function FinanceBoard({ subTab }: FinanceBoardProps) {
-  const [entries, setEntries] = useState<FinanceEntry[]>(() =>
-    JSON.parse(localStorage.getItem("dayboard.finance") || "[]")
-  );
-  const [desc, setDesc] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
-
-  const add = () => {
-    const n = parseFloat(amount);
-    if (!desc.trim() || Number.isNaN(n)) return;
-    const next: FinanceEntry[] = [
-      ...entries,
-      {
-        id: Date.now(),
-        desc: desc.trim(),
-        amount: n,
-        type: subTab || "expenses",
-      },
-    ];
-    setEntries(next);
-    localStorage.setItem("dayboard.finance", JSON.stringify(next));
-    setDesc("");
-    setAmount("");
-  };
-
-  const filteredEntries = entries.filter(
-    (e) => e.type === (subTab || "expenses")
-  );
-  const total = filteredEntries.reduce((s, e) => s + e.amount, 0);
-
-  return (
-    <div className="board">
-      <h3>
-        {subTab === "income"
-          ? "Income"
-          : subTab === "transfers"
-          ? "Transfers"
-          : "Expenses"}
-      </h3>
-      <p>
-        Log{" "}
-        {subTab === "income"
-          ? "income entries"
-          : subTab === "transfers"
-          ? "money transfers"
-          : "quick expenses"}
-        .
-      </p>
-      <div className="input-row">
-        <input
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          placeholder="Description"
-        />
-        <input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="Amount"
-        />
-        <button onClick={add}>Add</button>
-      </div>
-      <div className="finance-summary">
-        Total: <strong>₹{total.toFixed(2)}</strong>
-      </div>
-      <ul className="list">
-        {filteredEntries.map((en) => (
-          <li key={en.id}>
-            {en.desc} — ₹{en.amount}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

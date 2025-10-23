@@ -50,22 +50,16 @@ export const BOARD_CONFIGS: BoardConfiguration[] = [
 // Sub-tab configurations for non-grocery boards
 export const FINANCE_SUB_TABS: SubTabConfiguration[] = [
   {
-    key: "expenses",
-    title: "Expenses",
-    icon: "💸",
-    description: "Track your expenses",
+    key: "joshi",
+    title: "Joshi",
+    icon: "�",
+    description: "Joshi's financial entries",
   },
   {
-    key: "income",
-    title: "Income",
-    icon: "💵",
-    description: "Record income sources",
-  },
-  {
-    key: "transfers",
-    title: "Transfers",
-    icon: "🔄",
-    description: "Money transfers between accounts",
+    key: "nandu",
+    title: "Nandu",
+    icon: "�",
+    description: "Nandu's financial entries",
   },
 ];
 

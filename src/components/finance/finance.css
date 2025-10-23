@@ -1,0 +1,225 @@
+/* Finance Board Styles */
+.finance-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.finance-container h3 {
+  color: var(--primary-color);
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+}
+
+.finance-container p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+/* Add Entry Form */
+.add-entry-form {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.input-row input {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--input-background, var(--background-color));
+  color: var(--text-color);
+  font-size: 14px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.input-row input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb, 74, 144, 226), 0.2);
+}
+
+.input-row input[type="number"] {
+  max-width: 150px;
+}
+
+.input-row button {
+  padding: 10px 16px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.input-row button:hover:not(:disabled) {
+  background: var(--primary-hover, #5a8fd3);
+}
+
+.input-row button:disabled {
+  background: var(--disabled-color, #ccc);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Finance Summary */
+.finance-summary {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.finance-summary strong {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+}
+
+/* Finance Entries */
+.finance-entries {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.entry-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.entry-item:nth-child(even) {
+  background: var(--row-even-background, rgba(0, 0, 0, 0.02));
+}
+
+.entry-item:nth-child(odd) {
+  background: var(--row-odd-background, transparent);
+}
+
+.entry-item:hover {
+  background: var(--row-hover-background, rgba(var(--primary-color-rgb, 74, 144, 226), 0.1));
+}
+
+.entry-item:last-child {
+  border-bottom: none;
+}
+
+.entry-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.entry-desc {
+  color: var(--text-color);
+  font-weight: 500;
+  flex: 1;
+}
+
+.entry-amount {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  margin-left: 20px;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.remove-btn:hover {
+  opacity: 1;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* Empty State */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .finance-container {
+    padding: 16px;
+  }
+  
+  .input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .input-row input {
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .entry-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .entry-amount {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .entry-item:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .entry-item:hover {
+  background: rgba(74, 144, 226, 0.15);
+}
+
+[data-theme="dark"] .input-row input {
+  background: var(--background-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .remove-btn:hover {
+  background: rgba(220, 53, 69, 0.2);
+}
