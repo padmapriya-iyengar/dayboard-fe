@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import "./finance.css";
 
-interface FinanceEntry {
-  id: number;
-  desc: string;
-  amount: number;
-  type: string;
+interface ExpenseEntry {
+  Id: number;
+  Amount: number;
+  Description: string;
+  isDebit: boolean;
+  TxnDate: string;
+  Person_Id: number;
+  PersonName: string;
 }
 
 interface FinanceBoardProps {
@@ -13,12 +16,44 @@ interface FinanceBoardProps {
 }
 
 function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
-  const [entries, setEntries] = useState<FinanceEntry[]>(() =>
-    JSON.parse(localStorage.getItem("dayboard.finance") || "[]")
-  );
-  const [desc, setDesc] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
+  const [expenses, setExpenses] = useState<ExpenseEntry[]>([]);
   const [defaultPerson, setDefaultPerson] = useState<string>("joshi");
+  const [isLoadingExpenses, setIsLoadingExpenses] = useState<boolean>(false);
+
+  // Fetch expenses from API
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      setIsLoadingExpenses(true);
+      try {
+        const response = await fetch("http://localhost:3002/api/v1/expenses");
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log("Expenses API Response:", responseData); // Debug log
+
+          // Handle the expenses API response structure
+          if (
+            responseData.status === "success" &&
+            Array.isArray(responseData.data)
+          ) {
+            setExpenses(responseData.data);
+          } else {
+            console.warn(
+              "Expenses API response structure is not as expected:",
+              responseData
+            );
+          }
+        } else {
+          console.error("Failed to fetch expenses, status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      } finally {
+        setIsLoadingExpenses(false);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
 
   // Fetch persons to get the default person
   useEffect(() => {
@@ -49,34 +84,15 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     fetchPersons();
   }, []);
 
-  const add = () => {
-    const n = parseFloat(amount);
-    if (!desc.trim() || Number.isNaN(n)) return;
-    const next: FinanceEntry[] = [
-      ...entries,
-      {
-        id: Date.now(),
-        desc: desc.trim(),
-        amount: n,
-        type: subTab || defaultPerson,
-      },
-    ];
-    setEntries(next);
-    localStorage.setItem("dayboard.finance", JSON.stringify(next));
-    setDesc("");
-    setAmount("");
-  };
+  // Filter expenses by PersonName matching the current subTab
+  const filteredExpenses = expenses.filter((expense) => {
+    const currentPerson = subTab || defaultPerson;
+    return expense.PersonName.toLowerCase() === currentPerson.toLowerCase();
+  });
 
-  const removeEntry = (id: number) => {
-    const next = entries.filter((e) => e.id !== id);
-    setEntries(next);
-    localStorage.setItem("dayboard.finance", JSON.stringify(next));
-  };
-
-  const filteredEntries = entries.filter(
-    (e) => e.type === (subTab || defaultPerson)
-  );
-  const total = filteredEntries.reduce((s, e) => s + e.amount, 0);
+  const expensesTotal = filteredExpenses.reduce((sum, expense) => {
+    return sum + (expense.isDebit ? -expense.Amount : expense.Amount);
+  }, 0);
 
   const getTitle = () => {
     if (!subTab) return "Financial Entries";
@@ -96,54 +112,62 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
       <h3>{getTitle()}</h3>
       <p>Log {getDescription()}.</p>
 
-      <div className="add-entry-form">
-        <div className="input-row">
-          <input
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-            placeholder="Enter description (e.g., groceries, salary, transfer)"
-          />
-          <input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Amount (₹)"
-            type="number"
-            step="0.01"
-          />
-          <button onClick={add} disabled={!desc.trim() || !amount.trim()}>
-            Add Entry
-          </button>
+      {/* Expenses Table - Full Width */}
+      <div className="expenses-table-section">
+        <div className="expenses-header">
+          <h4>Expenses</h4>
+          <div className="expenses-total">
+            Total: <strong>₹{expensesTotal.toFixed(2)}</strong>
+          </div>
         </div>
-      </div>
-
-      <div className="finance-summary">
-        Total: <strong>₹{total.toFixed(2)}</strong>
-      </div>
-
-      <div className="finance-entries">
-        {filteredEntries.length > 0 ? (
-          <ul className="entry-list">
-            {filteredEntries.map((entry) => (
-              <li key={entry.id} className="entry-item">
-                <div className="entry-content">
-                  <span className="entry-desc">{entry.desc}</span>
-                  <span className="entry-amount">
-                    ₹{entry.amount.toFixed(2)}
-                  </span>
-                </div>
-                <button
-                  className="remove-btn"
-                  onClick={() => removeEntry(entry.id)}
-                  title="Remove entry"
-                >
-                  🗑️
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
+        {isLoadingExpenses && (
+          <div className="loading-state">Loading expenses...</div>
+        )}
+        {!isLoadingExpenses && filteredExpenses.length > 0 && (
+          <div className="expenses-table-container">
+            <table className="expenses-table">
+              <thead>
+                <tr>
+                  <th>DATE</th>
+                  <th>DESCRIPTION</th>
+                  <th>TYPE</th>
+                  <th>AMOUNT</th>
+                  <th>PERSON</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredExpenses.map((expense) => (
+                  <tr key={expense.Id}>
+                    <td className="expense-date">
+                      {new Date(expense.TxnDate).toLocaleDateString("en-GB")}
+                    </td>
+                    <td className="expense-desc">{expense.Description}</td>
+                    <td className="expense-type">
+                      <span
+                        className={`type-badge ${
+                          expense.isDebit ? "debit" : "credit"
+                        }`}
+                      >
+                        {expense.isDebit ? "Debit" : "Credit"}
+                      </span>
+                    </td>
+                    <td
+                      className={`expense-amount ${
+                        expense.isDebit ? "debit" : "credit"
+                      }`}
+                    >
+                      {expense.isDebit ? "-" : "+"}₹{expense.Amount.toFixed(2)}
+                    </td>
+                    <td className="expense-person">{expense.PersonName}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!isLoadingExpenses && filteredExpenses.length === 0 && (
           <div className="empty-state">
-            <span>No {getDescription()} recorded yet</span>
+            <span>No expenses found for {getDescription()}</span>
           </div>
         )}
       </div>

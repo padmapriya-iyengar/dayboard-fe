@@ -1,8 +1,13 @@
 /* Finance Board Styles */
 .finance-container {
   padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: calc(100vh - 200px);
 }
 
 .finance-container h3 {
@@ -17,157 +22,37 @@
   font-size: 0.95rem;
 }
 
-/* Add Entry Form */
-.add-entry-form {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.input-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.input-row input {
-  padding: 10px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--input-background, var(--background-color));
-  color: var(--text-color);
-  font-size: 14px;
+/* Expenses Table Section - Full Width */
+.expenses-table-section {
+  margin-top: 0;
+  height: fit-content;
   flex: 1;
-  min-width: 120px;
 }
 
-.input-row input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb, 74, 144, 226), 0.2);
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: #f8f9fa;
 }
 
-.input-row input[type="number"] {
-  max-width: 150px;
+.expenses-header h4 {
+  color: var(--primary-color);
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-.input-row button {
-  padding: 10px 16px;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  white-space: nowrap;
-}
-
-.input-row button:hover:not(:disabled) {
-  background: var(--primary-hover, #5a8fd3);
-}
-
-.input-row button:disabled {
-  background: var(--disabled-color, #ccc);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Finance Summary */
-.finance-summary {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  text-align: center;
+.expenses-total {
   font-size: 1.1rem;
   color: var(--text-color);
 }
 
-.finance-summary strong {
+.expenses-total strong {
   color: var(--primary-color);
-  font-size: 1.3rem;
-}
-
-/* Finance Entries */
-.finance-entries {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.entry-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.entry-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.2s;
-}
-
-.entry-item:nth-child(even) {
-  background: var(--row-even-background, rgba(0, 0, 0, 0.02));
-}
-
-.entry-item:nth-child(odd) {
-  background: var(--row-odd-background, transparent);
-}
-
-.entry-item:hover {
-  background: var(--row-hover-background, rgba(var(--primary-color-rgb, 74, 144, 226), 0.1));
-}
-
-.entry-item:last-child {
-  border-bottom: none;
-}
-
-.entry-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  margin-right: 12px;
-}
-
-.entry-desc {
-  color: var(--text-color);
-  font-weight: 500;
-  flex: 1;
-}
-
-.entry-amount {
-  color: var(--primary-color);
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
-  margin-left: 20px;
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 4px;
-  font-size: 14px;
-  opacity: 0.6;
-  transition: all 0.2s;
-}
-
-.remove-btn:hover {
-  opacity: 1;
-  background: rgba(220, 53, 69, 0.1);
+  font-size: 1.2rem;
 }
 
 /* Empty State */
@@ -178,7 +63,201 @@
   font-style: italic;
 }
 
+/* Loading State */
+.loading-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.expenses-table-container {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.expenses-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+.expenses-table thead th {
+  background: #f8f9fa;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #666;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.expenses-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-color);
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.expenses-table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.expenses-table tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.expenses-table tbody tr:hover {
+  background: #e8f4fd;
+}
+
+.expenses-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Table Cell Styles */
+.expense-date {
+  font-weight: 500;
+  color: #666;
+  min-width: 100px;
+}
+
+.expense-desc {
+  font-weight: 500;
+  color: var(--text-color);
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.expense-type {
+  text-align: center;
+  min-width: 80px;
+}
+
+.type-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.type-badge.debit {
+  background: #fee;
+  color: #c53030;
+}
+
+.type-badge.credit {
+  background: #f0fff4;
+  color: #38a169;
+}
+
+.expense-amount {
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  text-align: right;
+  min-width: 120px;
+}
+
+.expense-amount.debit {
+  color: #c53030;
+}
+
+.expense-amount.credit {
+  color: #38a169;
+}
+
+.expense-person {
+  font-weight: 500;
+  color: var(--primary-color);
+  min-width: 80px;
+}
+
+/* Dark theme overrides for expenses table */
+[data-theme="dark"] .expenses-table thead th {
+  background: #555;
+  color: #b0b0b0;
+  border-bottom-color: #666;
+}
+
+[data-theme="dark"] .expenses-table tbody td {
+  border-bottom-color: #4a4a4a;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .expenses-table tbody tr:nth-child(even) {
+  background: #3a3a3a;
+}
+
+[data-theme="dark"] .expenses-table tbody tr:nth-child(odd) {
+  background: #404040;
+}
+
+[data-theme="dark"] .expenses-table tbody tr:hover {
+  background: #4a5568;
+}
+
+[data-theme="dark"] .type-badge.debit {
+  background: #4a1a1a;
+  color: #fc8181;
+}
+
+[data-theme="dark"] .type-badge.credit {
+  background: #1a3a1a;
+  color: #68d391;
+}
+
+[data-theme="dark"] .expense-amount.debit {
+  color: #fc8181;
+}
+
+[data-theme="dark"] .expense-amount.credit {
+  color: #68d391;
+}
+
+[data-theme="dark"] .expense-person {
+  color: #4dabf7;
+}
+
+/* Dark theme section headers */
+[data-theme="dark"] .expenses-header {
+  background: #555;
+  border-bottom-color: #666;
+}
+
+[data-theme="dark"] .expenses-header h4 {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .expenses-total {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .expenses-total strong {
+  color: #4a90e2;
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .finance-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .expenses-table-section {
+    margin-top: 0;
+  }
+}
+
 @media (max-width: 600px) {
   .finance-container {
     padding: 16px;
@@ -192,6 +271,15 @@
   .input-row input {
     min-width: auto;
     max-width: none;
+  }
+  
+  .finance-summary {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .finance-summary > div {
+    min-width: auto;
   }
   
   .entry-content {
