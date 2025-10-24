@@ -22,6 +22,22 @@
   font-size: 0.95rem;
 }
 
+/* Accounts Container */
+.accounts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Account Section */
+.account-section {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Expenses Table Section - Full Width */
 .expenses-table-section {
   margin-top: 0;
@@ -36,6 +52,40 @@
   padding: 16px 20px 12px 20px;
   border-bottom: 1px solid var(--border-color);
   background: #f8f9fa;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.expenses-header.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.expenses-header.clickable:hover {
+  background: #e9ecef;
+}
+
+.expenses-header.clickable:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.collapse-icon {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  color: var(--primary-color);
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
 }
 
 .expenses-header h4 {
@@ -229,9 +279,27 @@
 }
 
 /* Dark theme section headers */
+[data-theme="dark"] .account-section {
+  background: #2d2d2d;
+  border-color: #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 [data-theme="dark"] .expenses-header {
   background: #555;
   border-bottom-color: #666;
+}
+
+[data-theme="dark"] .expenses-header.clickable:hover {
+  background: #666;
+}
+
+[data-theme="dark"] .expenses-header.clickable:focus {
+  outline-color: #4a90e2;
+}
+
+[data-theme="dark"] .collapse-icon {
+  color: #4a90e2;
 }
 
 [data-theme="dark"] .expenses-header h4 {
