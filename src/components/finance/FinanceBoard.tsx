@@ -13,17 +13,35 @@ interface ExpenseEntry {
   PersonName: string;
 }
 
+interface InstallmentEntry {
+  Id: number;
+  Account_Id: number;
+  Amount: number;
+  Description?: string;
+  isDebit: boolean;
+  Start_Date: string;
+  End_Date: string;
+  AccountName: string;
+  Currency: string;
+  PersonName: string;
+}
+
 interface FinanceBoardProps {
   subTab?: string;
 }
 
 function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   const [expenses, setExpenses] = useState<ExpenseEntry[]>([]);
+  const [installments, setInstallments] = useState<InstallmentEntry[]>([]);
   const [defaultPerson, setDefaultPerson] = useState<string>("joshi");
   const [isLoadingExpenses, setIsLoadingExpenses] = useState<boolean>(false);
+  const [isLoadingInstallments, setIsLoadingInstallments] =
+    useState<boolean>(false);
   const [collapsedAccounts, setCollapsedAccounts] = useState<Set<string>>(
     new Set()
   );
+  const [isInstallmentsCollapsed, setIsInstallmentsCollapsed] =
+    useState<boolean>(false);
 
   // Fetch expenses from API
   useEffect(() => {
@@ -60,6 +78,46 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     fetchExpenses();
   }, []);
 
+  // Fetch installments from API
+  useEffect(() => {
+    const fetchInstallments = async () => {
+      setIsLoadingInstallments(true);
+      try {
+        const response = await fetch(
+          "http://localhost:3002/api/v1/installments"
+        );
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log("Installments API Response:", responseData); // Debug log
+
+          // Handle the installments API response structure
+          if (
+            responseData.status === "success" &&
+            Array.isArray(responseData.data)
+          ) {
+            setInstallments(responseData.data);
+          } else {
+            console.warn(
+              "Installments API response structure is not as expected:",
+              responseData
+            );
+          }
+        } else {
+          console.error(
+            "Failed to fetch installments, status:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching installments:", error);
+      } finally {
+        setIsLoadingInstallments(false);
+      }
+    };
+
+    fetchInstallments();
+  }, []);
+
   // Fetch persons to get the default person
   useEffect(() => {
     const fetchPersons = async () => {
@@ -93,6 +151,12 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   const filteredExpenses = expenses.filter((expense) => {
     const currentPerson = subTab || defaultPerson;
     return expense.PersonName.toLowerCase() === currentPerson.toLowerCase();
+  });
+
+  // Filter installments by PersonName matching the current subTab
+  const filteredInstallments = installments.filter((installment) => {
+    const currentPerson = subTab || defaultPerson;
+    return installment.PersonName.toLowerCase() === currentPerson.toLowerCase();
   });
 
   // Group expenses by account
@@ -132,6 +196,11 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
       }
       return newSet;
     });
+  };
+
+  // Toggle installments collapse state
+  const toggleInstallmentsCollapse = () => {
+    setIsInstallmentsCollapsed((prev) => !prev);
   };
 
   const getTitle = () => {
@@ -257,6 +326,121 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
           )}
         </div>
       )}
+
+      {/* Installments Section */}
+      <div className="installments-section">
+        <button
+          className="installments-header clickable"
+          onClick={toggleInstallmentsCollapse}
+          aria-expanded={!isInstallmentsCollapsed}
+          aria-controls="installments-content"
+        >
+          <div className="header-left">
+            <span
+              className={`collapse-icon ${
+                isInstallmentsCollapsed ? "collapsed" : ""
+              }`}
+            >
+              ▼
+            </span>
+            <h3>Monthly Installments</h3>
+          </div>
+          <div className="installments-summary">
+            {!isLoadingInstallments && filteredInstallments.length > 0 && (
+              <span>
+                {filteredInstallments.length} installment
+                {filteredInstallments.length !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+        </button>
+
+        {!isInstallmentsCollapsed && (
+          <div id="installments-content">
+            {isLoadingInstallments && (
+              <div className="loading-state">Loading installments...</div>
+            )}
+
+            {!isLoadingInstallments && filteredInstallments.length === 0 && (
+              <div className="empty-state">
+                <span>No installments found for {getDescription()}</span>
+              </div>
+            )}
+
+            {!isLoadingInstallments && filteredInstallments.length > 0 && (
+              <div className="installments-container">
+                <div className="installments-table-container">
+                  <table className="installments-table">
+                    <thead>
+                      <tr>
+                        <th>ACCOUNT</th>
+                        <th>DESCRIPTION</th>
+                        <th>AMOUNT</th>
+                        <th>TYPE</th>
+                        <th>START DATE</th>
+                        <th>END DATE</th>
+                        <th>DURATION</th>
+                        <th>PERSON</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredInstallments.map((installment) => {
+                        const startDate = new Date(installment.Start_Date);
+                        const endDate = new Date(installment.End_Date);
+                        const durationMonths = Math.round(
+                          (endDate.getTime() - startDate.getTime()) /
+                            (1000 * 60 * 60 * 24 * 30.44)
+                        );
+
+                        return (
+                          <tr key={installment.Id}>
+                            <td className="installment-account">
+                              {installment.AccountName}
+                            </td>
+                            <td className="installment-desc">
+                              {installment.Description || "No description"}
+                            </td>
+                            <td
+                              className={`installment-amount ${
+                                installment.isDebit ? "debit" : "credit"
+                              }`}
+                            >
+                              {installment.isDebit ? "-" : "+"}
+                              {getCurrencySymbol(installment.Currency)}
+                              {installment.Amount.toFixed(2)}
+                            </td>
+                            <td className="installment-type">
+                              <span
+                                className={`type-badge ${
+                                  installment.isDebit ? "debit" : "credit"
+                                }`}
+                              >
+                                {installment.isDebit ? "Debit" : "Credit"}
+                              </span>
+                            </td>
+                            <td className="installment-start-date">
+                              {startDate.toLocaleDateString("en-GB")}
+                            </td>
+                            <td className="installment-end-date">
+                              {endDate.toLocaleDateString("en-GB")}
+                            </td>
+                            <td className="installment-duration">
+                              {durationMonths} months
+                            </td>
+                            <td className="installment-person">
+                              {installment.PersonName}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

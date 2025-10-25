@@ -278,6 +278,141 @@
   color: #4dabf7;
 }
 
+/* Installments Section */
+.installments-section {
+  margin-top: 32px;
+}
+
+.installments-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 16px;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.installments-container {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.installments-table-container {
+  overflow-x: auto;
+}
+
+.installments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-background);
+}
+
+.installments-table thead th {
+  background: var(--primary-color);
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.installments-table tbody td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.installments-table tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.installments-table tbody tr:nth-child(odd) {
+  background: white;
+}
+
+.installments-table tbody tr:hover {
+  background: var(--hover-background, #e9ecef);
+}
+
+.installments-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.installment-amount.debit {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.installment-amount.credit {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.installment-duration {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.installment-person {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.installment-desc {
+  color: var(--text-color);
+  font-size: 0.9rem;
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+/* Installments Header */
+.installments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 100%;
+  text-align: left;
+  background: var(--card-background);
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.installments-header.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.installments-header.clickable:hover {
+  background: var(--hover-background, #f8f9fa);
+}
+
+.installments-header.clickable:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.installments-header h3 {
+  color: var(--primary-color);
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.installments-summary {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
 /* Dark theme section headers */
 [data-theme="dark"] .account-section {
   background: #2d2d2d;
@@ -378,4 +513,80 @@
 
 [data-theme="dark"] .remove-btn:hover {
   background: rgba(220, 53, 69, 0.2);
+}
+
+/* Dark theme installments */
+[data-theme="dark"] .installments-container {
+  background: #2d2d2d;
+  border-color: #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .installments-table {
+  background: #2d2d2d;
+}
+
+[data-theme="dark"] .installments-table thead th {
+  background: #1a5f7a;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .installments-table tbody td {
+  color: #e0e0e0;
+  border-bottom-color: #666;
+}
+
+[data-theme="dark"] .installments-table tbody tr:nth-child(even) {
+  background: #3d3d3d;
+}
+
+[data-theme="dark"] .installments-table tbody tr:nth-child(odd) {
+  background: #2d2d2d;
+}
+
+[data-theme="dark"] .installments-table tbody tr:hover {
+  background: #4d4d4d;
+}
+
+[data-theme="dark"] .installment-amount.debit {
+  color: #fc8181;
+}
+
+[data-theme="dark"] .installment-amount.credit {
+  color: #68d391;
+}
+
+[data-theme="dark"] .installment-duration {
+  color: #4a90e2;
+}
+
+[data-theme="dark"] .installment-person {
+  color: #4dabf7;
+}
+
+/* Dark theme installments header */
+[data-theme="dark"] .installments-header {
+  background: #2d2d2d;
+  border-color: #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .installments-header.clickable:hover {
+  background: #3d3d3d;
+}
+
+[data-theme="dark"] .installments-header.clickable:focus {
+  outline-color: #4a90e2;
+}
+
+[data-theme="dark"] .installments-header h3 {
+  color: #4a90e2;
+}
+
+[data-theme="dark"] .installments-summary {
+  color: #a0a0a0;
+}
+
+[data-theme="dark"] .installment-desc {
+  color: #e0e0e0;
 }
