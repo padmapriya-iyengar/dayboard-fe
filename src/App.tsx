@@ -119,11 +119,15 @@ export default function App() {
     })),
     finance:
       Array.isArray(persons) && persons.length > 0
-        ? persons.map((person) => ({
-            key: person.name.toLowerCase(),
-            title: person.name,
-          }))
+        ? [
+            { key: "summary", title: "Summary" },
+            ...persons.map((person) => ({
+              key: person.name.toLowerCase(),
+              title: person.name,
+            })),
+          ]
         : [
+            { key: "summary", title: "Summary" },
             { key: "joshi", title: "Joshi" },
             { key: "nandu", title: "Nandu" },
           ],

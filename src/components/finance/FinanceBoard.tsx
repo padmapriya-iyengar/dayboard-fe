@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./finance.css";
+import PortfolioSummary from "./PortfolioSummary";
 
 interface ExpenseEntry {
   Id: number;
@@ -182,7 +183,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   };
 
   const getCurrencySymbol = (currency: string) => {
-    return currency === "AED" ? "د.إ" : currency;
+    return currency === "AED" ? "DH" : currency;
   };
 
   // Toggle account collapse state
@@ -218,229 +219,236 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
 
   return (
     <div className="finance-container">
-      <h3>{getTitle()}</h3>
-      <p>Log {getDescription()}.</p>
+      {subTab === "summary" ? (
+        <PortfolioSummary />
+      ) : (
+        <>
+          <h3>{getTitle()}</h3>
 
-      {/* Expenses by Account - Full Width */}
-      {isLoadingExpenses && (
-        <div className="loading-state">Loading expenses...</div>
-      )}
+          {/* Expenses by Account - Full Width */}
+          {isLoadingExpenses && (
+            <div className="loading-state">Loading expenses...</div>
+          )}
 
-      {!isLoadingExpenses && Object.keys(expensesByAccount).length === 0 && (
-        <div className="empty-state">
-          <span>No expenses found for {getDescription()}</span>
-        </div>
-      )}
+          {!isLoadingExpenses &&
+            Object.keys(expensesByAccount).length === 0 && (
+              <div className="empty-state">
+                <span>No expenses found for {getDescription()}</span>
+              </div>
+            )}
 
-      {!isLoadingExpenses && Object.keys(expensesByAccount).length > 0 && (
-        <div className="accounts-container">
-          {Object.entries(expensesByAccount).map(
-            ([accountName, accountExpenses]) => {
-              const accountTotal = getAccountTotal(accountExpenses);
-              const accountCurrency = getAccountCurrency(accountExpenses);
-              const currencySymbol = getCurrencySymbol(accountCurrency);
-              const isCollapsed = collapsedAccounts.has(accountName);
+          {!isLoadingExpenses && Object.keys(expensesByAccount).length > 0 && (
+            <div className="accounts-container">
+              {Object.entries(expensesByAccount).map(
+                ([accountName, accountExpenses]) => {
+                  const accountTotal = getAccountTotal(accountExpenses);
+                  const accountCurrency = getAccountCurrency(accountExpenses);
+                  const currencySymbol = getCurrencySymbol(accountCurrency);
+                  const isCollapsed = collapsedAccounts.has(accountName);
 
-              return (
-                <div key={accountName} className="account-section">
-                  <button
-                    className="expenses-header clickable"
-                    onClick={() => toggleAccountCollapse(accountName)}
-                    aria-expanded={!isCollapsed}
-                    aria-controls={`account-${accountName}-content`}
-                  >
-                    <div className="header-left">
-                      <span
-                        className={`collapse-icon ${
-                          isCollapsed ? "collapsed" : ""
-                        }`}
+                  return (
+                    <div key={accountName} className="account-section">
+                      <button
+                        className="expenses-header clickable"
+                        onClick={() => toggleAccountCollapse(accountName)}
+                        aria-expanded={!isCollapsed}
+                        aria-controls={`account-${accountName}-content`}
                       >
-                        ▼
-                      </span>
-                      <h4>{accountName} Account</h4>
+                        <div className="header-left">
+                          <span
+                            className={`collapse-icon ${
+                              isCollapsed ? "collapsed" : ""
+                            }`}
+                          >
+                            ▼
+                          </span>
+                          <h4>{accountName} Account</h4>
+                        </div>
+                        <div className="expenses-total">
+                          Total:{" "}
+                          <strong>
+                            {currencySymbol}
+                            {accountTotal.toFixed(2)}
+                          </strong>
+                        </div>
+                      </button>
+                      {!isCollapsed && (
+                        <div
+                          className="expenses-table-container"
+                          id={`account-${accountName}-content`}
+                        >
+                          <table className="expenses-table">
+                            <thead>
+                              <tr>
+                                <th>DATE</th>
+                                <th>DESCRIPTION</th>
+                                <th>TYPE</th>
+                                <th>AMOUNT</th>
+                                <th>PERSON</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {accountExpenses.map((expense) => (
+                                <tr key={expense.Id}>
+                                  <td className="expense-date">
+                                    {new Date(
+                                      expense.TxnDate
+                                    ).toLocaleDateString("en-GB")}
+                                  </td>
+                                  <td className="expense-desc">
+                                    {expense.Description}
+                                  </td>
+                                  <td className="expense-type">
+                                    <span
+                                      className={`type-badge ${
+                                        expense.isDebit ? "debit" : "credit"
+                                      }`}
+                                    >
+                                      {expense.isDebit ? "Debit" : "Credit"}
+                                    </span>
+                                  </td>
+                                  <td
+                                    className={`expense-amount ${
+                                      expense.isDebit ? "debit" : "credit"
+                                    }`}
+                                  >
+                                    {expense.isDebit ? "-" : "+"}
+                                    {getCurrencySymbol(expense.Currency)}
+                                    {expense.Amount.toFixed(2)}
+                                  </td>
+                                  <td className="expense-person">
+                                    {expense.PersonName}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
-                    <div className="expenses-total">
-                      Total:{" "}
-                      <strong>
-                        {currencySymbol}
-                        {accountTotal.toFixed(2)}
-                      </strong>
+                  );
+                }
+              )}
+            </div>
+          )}
+
+          {/* Installments Section */}
+          <div className="installments-section">
+            <button
+              className="installments-header clickable"
+              onClick={toggleInstallmentsCollapse}
+              aria-expanded={!isInstallmentsCollapsed}
+              aria-controls="installments-content"
+            >
+              <div className="header-left">
+                <span
+                  className={`collapse-icon ${
+                    isInstallmentsCollapsed ? "collapsed" : ""
+                  }`}
+                >
+                  ▼
+                </span>
+                <h3>Monthly Installments</h3>
+              </div>
+              <div className="installments-summary">
+                {!isLoadingInstallments && filteredInstallments.length > 0 && (
+                  <span>
+                    {filteredInstallments.length} installment
+                    {filteredInstallments.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
+            </button>
+
+            {!isInstallmentsCollapsed && (
+              <div id="installments-content">
+                {isLoadingInstallments && (
+                  <div className="loading-state">Loading installments...</div>
+                )}
+
+                {!isLoadingInstallments &&
+                  filteredInstallments.length === 0 && (
+                    <div className="empty-state">
+                      <span>No installments found for {getDescription()}</span>
                     </div>
-                  </button>
-                  {!isCollapsed && (
-                    <div
-                      className="expenses-table-container"
-                      id={`account-${accountName}-content`}
-                    >
-                      <table className="expenses-table">
+                  )}
+
+                {!isLoadingInstallments && filteredInstallments.length > 0 && (
+                  <div className="installments-container">
+                    <div className="installments-table-container">
+                      <table className="installments-table">
                         <thead>
                           <tr>
-                            <th>DATE</th>
+                            <th>ACCOUNT</th>
                             <th>DESCRIPTION</th>
-                            <th>TYPE</th>
                             <th>AMOUNT</th>
+                            <th>TYPE</th>
+                            <th>START DATE</th>
+                            <th>END DATE</th>
+                            <th>DURATION</th>
                             <th>PERSON</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {accountExpenses.map((expense) => (
-                            <tr key={expense.Id}>
-                              <td className="expense-date">
-                                {new Date(expense.TxnDate).toLocaleDateString(
-                                  "en-GB"
-                                )}
-                              </td>
-                              <td className="expense-desc">
-                                {expense.Description}
-                              </td>
-                              <td className="expense-type">
-                                <span
-                                  className={`type-badge ${
-                                    expense.isDebit ? "debit" : "credit"
+                          {filteredInstallments.map((installment) => {
+                            const startDate = new Date(installment.Start_Date);
+                            const endDate = new Date(installment.End_Date);
+                            const durationMonths = Math.round(
+                              (endDate.getTime() - startDate.getTime()) /
+                                (1000 * 60 * 60 * 24 * 30.44)
+                            );
+
+                            return (
+                              <tr key={installment.Id}>
+                                <td className="installment-account">
+                                  {installment.AccountName}
+                                </td>
+                                <td className="installment-desc">
+                                  {installment.Description || "No description"}
+                                </td>
+                                <td
+                                  className={`installment-amount ${
+                                    installment.isDebit ? "debit" : "credit"
                                   }`}
                                 >
-                                  {expense.isDebit ? "Debit" : "Credit"}
-                                </span>
-                              </td>
-                              <td
-                                className={`expense-amount ${
-                                  expense.isDebit ? "debit" : "credit"
-                                }`}
-                              >
-                                {expense.isDebit ? "-" : "+"}
-                                {getCurrencySymbol(expense.Currency)}
-                                {expense.Amount.toFixed(2)}
-                              </td>
-                              <td className="expense-person">
-                                {expense.PersonName}
-                              </td>
-                            </tr>
-                          ))}
+                                  {installment.isDebit ? "-" : "+"}
+                                  {getCurrencySymbol(installment.Currency)}
+                                  {installment.Amount.toFixed(2)}
+                                </td>
+                                <td className="installment-type">
+                                  <span
+                                    className={`type-badge ${
+                                      installment.isDebit ? "debit" : "credit"
+                                    }`}
+                                  >
+                                    {installment.isDebit ? "Debit" : "Credit"}
+                                  </span>
+                                </td>
+                                <td className="installment-start-date">
+                                  {startDate.toLocaleDateString("en-GB")}
+                                </td>
+                                <td className="installment-end-date">
+                                  {endDate.toLocaleDateString("en-GB")}
+                                </td>
+                                <td className="installment-duration">
+                                  {durationMonths} months
+                                </td>
+                                <td className="installment-person">
+                                  {installment.PersonName}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
-                  )}
-                </div>
-              );
-            }
-          )}
-        </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </>
       )}
-
-      {/* Installments Section */}
-      <div className="installments-section">
-        <button
-          className="installments-header clickable"
-          onClick={toggleInstallmentsCollapse}
-          aria-expanded={!isInstallmentsCollapsed}
-          aria-controls="installments-content"
-        >
-          <div className="header-left">
-            <span
-              className={`collapse-icon ${
-                isInstallmentsCollapsed ? "collapsed" : ""
-              }`}
-            >
-              ▼
-            </span>
-            <h3>Monthly Installments</h3>
-          </div>
-          <div className="installments-summary">
-            {!isLoadingInstallments && filteredInstallments.length > 0 && (
-              <span>
-                {filteredInstallments.length} installment
-                {filteredInstallments.length !== 1 ? "s" : ""}
-              </span>
-            )}
-          </div>
-        </button>
-
-        {!isInstallmentsCollapsed && (
-          <div id="installments-content">
-            {isLoadingInstallments && (
-              <div className="loading-state">Loading installments...</div>
-            )}
-
-            {!isLoadingInstallments && filteredInstallments.length === 0 && (
-              <div className="empty-state">
-                <span>No installments found for {getDescription()}</span>
-              </div>
-            )}
-
-            {!isLoadingInstallments && filteredInstallments.length > 0 && (
-              <div className="installments-container">
-                <div className="installments-table-container">
-                  <table className="installments-table">
-                    <thead>
-                      <tr>
-                        <th>ACCOUNT</th>
-                        <th>DESCRIPTION</th>
-                        <th>AMOUNT</th>
-                        <th>TYPE</th>
-                        <th>START DATE</th>
-                        <th>END DATE</th>
-                        <th>DURATION</th>
-                        <th>PERSON</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredInstallments.map((installment) => {
-                        const startDate = new Date(installment.Start_Date);
-                        const endDate = new Date(installment.End_Date);
-                        const durationMonths = Math.round(
-                          (endDate.getTime() - startDate.getTime()) /
-                            (1000 * 60 * 60 * 24 * 30.44)
-                        );
-
-                        return (
-                          <tr key={installment.Id}>
-                            <td className="installment-account">
-                              {installment.AccountName}
-                            </td>
-                            <td className="installment-desc">
-                              {installment.Description || "No description"}
-                            </td>
-                            <td
-                              className={`installment-amount ${
-                                installment.isDebit ? "debit" : "credit"
-                              }`}
-                            >
-                              {installment.isDebit ? "-" : "+"}
-                              {getCurrencySymbol(installment.Currency)}
-                              {installment.Amount.toFixed(2)}
-                            </td>
-                            <td className="installment-type">
-                              <span
-                                className={`type-badge ${
-                                  installment.isDebit ? "debit" : "credit"
-                                }`}
-                              >
-                                {installment.isDebit ? "Debit" : "Credit"}
-                              </span>
-                            </td>
-                            <td className="installment-start-date">
-                              {startDate.toLocaleDateString("en-GB")}
-                            </td>
-                            <td className="installment-end-date">
-                              {endDate.toLocaleDateString("en-GB")}
-                            </td>
-                            <td className="installment-duration">
-                              {durationMonths} months
-                            </td>
-                            <td className="installment-person">
-                              {installment.PersonName}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
