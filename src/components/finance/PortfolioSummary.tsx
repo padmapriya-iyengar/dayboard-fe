@@ -121,8 +121,19 @@ function PortfolioSummary() {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    const symbol = currency === "AED" ? "DH" : "₹";
-    return `${symbol}${amount.toLocaleString("en-US", {
+    if (currency === "AED") {
+      return (
+        <>
+          <span className="dirham-symbol">&#xea;</span>{" "}
+          {amount.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </>
+      );
+    }
+    const symbol = "₹";
+    return `${symbol} ${amount.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
@@ -192,7 +203,9 @@ function PortfolioSummary() {
         <h3>💰 Overall Financial Position</h3>
         <div className="currency-grid">
           <div className="currency-card aed">
-            <h4>UAE Dirham (AED)</h4>
+            <h4>
+              <span className="dirham-symbol">&#xea;</span> UAE Dirham (AED)
+            </h4>
             <div className="amounts-grid">
               <div className="amount-item credit">
                 <span className="label">Total Credits</span>
@@ -222,7 +235,7 @@ function PortfolioSummary() {
           </div>
 
           <div className="currency-card inr">
-            <h4>Indian Rupee (INR)</h4>
+            <h4>₹ Indian Rupee (INR)</h4>
             <div className="amounts-grid">
               <div className="amount-item credit">
                 <span className="label">Total Credits</span>
@@ -289,7 +302,9 @@ function PortfolioSummary() {
                 <div className="portfolio-content">
                   <div className="person-totals">
                     <div className="total-card aed">
-                      <h5>AED Totals</h5>
+                      <h5>
+                        <span className="dirham-symbol">&#xea;</span> AED Totals
+                      </h5>
                       <div className="total-amounts">
                         <span className="net-amount">
                           Net:{" "}
@@ -301,7 +316,7 @@ function PortfolioSummary() {
                       </div>
                     </div>
                     <div className="total-card inr">
-                      <h5>INR Totals</h5>
+                      <h5>₹ INR Totals</h5>
                       <div className="total-amounts">
                         <span className="net-amount">
                           Net:{" "}
@@ -380,8 +395,11 @@ function PortfolioSummary() {
       <div className="exchange-rate-info">
         <h4>💱 Current Exchange Rates</h4>
         <div className="rates">
-          <span>1 AED = ₹{summary.conversionRate.aedToInr}</span>
-          <span>1 INR = DH{summary.conversionRate.inrToAed.toFixed(4)}</span>
+          <span>1 AED = ₹ {summary.conversionRate.aedToInr}</span>
+          <span>
+            1 INR = <span className="dirham-symbol">&#xea;</span>{" "}
+            {summary.conversionRate.inrToAed.toFixed(4)}
+          </span>
         </div>
         <div className="generated-at">
           Last updated: {new Date(summary.generatedAt).toLocaleString()}

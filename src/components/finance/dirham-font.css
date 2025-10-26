@@ -1,0 +1,26 @@
+/* UAE Dirham Symbol Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.dirham-symbol {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+}
+
+/* Custom Dirham Symbol using CSS */
+.dirham-symbol::before {
+  content: '₯';
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+/* Alternative implementation using Unicode */
+.uae-dirham {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.uae-dirham::before {
+  content: '\20AE'; /* Unicode for generic currency symbol that looks like Dirham */
+}

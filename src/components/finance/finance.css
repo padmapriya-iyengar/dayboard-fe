@@ -1,3 +1,18 @@
+/* UAE Dirham Symbol Font - Using new-dirham-symbol package */
+@font-face {
+    font-family: 'UAESymbol';
+    src: url('/uae-symbol.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.dirham-symbol {
+    font-family: 'UAESymbol', Arial, sans-serif;
+    font-size: inherit;
+    color: inherit;
+    font-weight: normal;
+}
+
 /* Finance Board Styles */
 .finance-container {
   padding: 20px;
@@ -233,48 +248,48 @@
 }
 
 /* Dark theme overrides for expenses table */
-[data-theme="dark"] .expenses-table thead th {
+.dark-theme .expenses-table thead th {
   background: #555;
   color: #b0b0b0;
   border-bottom-color: #666;
 }
 
-[data-theme="dark"] .expenses-table tbody td {
+.dark-theme .expenses-table tbody td {
   border-bottom-color: #4a4a4a;
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .expenses-table tbody tr:nth-child(even) {
+.dark-theme .expenses-table tbody tr:nth-child(even) {
   background: #3a3a3a;
 }
 
-[data-theme="dark"] .expenses-table tbody tr:nth-child(odd) {
+.dark-theme .expenses-table tbody tr:nth-child(odd) {
   background: #404040;
 }
 
-[data-theme="dark"] .expenses-table tbody tr:hover {
+.dark-theme .expenses-table tbody tr:hover {
   background: #4a5568;
 }
 
-[data-theme="dark"] .type-badge.debit {
+.dark-theme .type-badge.debit {
   background: #4a1a1a;
   color: #fc8181;
 }
 
-[data-theme="dark"] .type-badge.credit {
+.dark-theme .type-badge.credit {
   background: #1a3a1a;
   color: #68d391;
 }
 
-[data-theme="dark"] .expense-amount.debit {
+.dark-theme .expense-amount.debit {
   color: #fc8181;
 }
 
-[data-theme="dark"] .expense-amount.credit {
+.dark-theme .expense-amount.credit {
   color: #68d391;
 }
 
-[data-theme="dark"] .expense-person {
+.dark-theme .expense-person {
   color: #4dabf7;
 }
 
@@ -414,38 +429,38 @@
 }
 
 /* Dark theme section headers */
-[data-theme="dark"] .account-section {
+.dark-theme .account-section {
   background: #2d2d2d;
   border-color: #666;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .expenses-header {
+.dark-theme .expenses-header {
   background: #555;
   border-bottom-color: #666;
 }
 
-[data-theme="dark"] .expenses-header.clickable:hover {
+.dark-theme .expenses-header.clickable:hover {
   background: #666;
 }
 
-[data-theme="dark"] .expenses-header.clickable:focus {
+.dark-theme .expenses-header.clickable:focus {
   outline-color: #4a90e2;
 }
 
-[data-theme="dark"] .collapse-icon {
+.dark-theme .collapse-icon {
   color: #4a90e2;
 }
 
-[data-theme="dark"] .expenses-header h4 {
+.dark-theme .expenses-header h4 {
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .expenses-total {
+.dark-theme .expenses-total {
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .expenses-total strong {
+.dark-theme .expenses-total strong {
   color: #4a90e2;
 }
 
@@ -498,95 +513,109 @@
 }
 
 /* Dark theme adjustments */
-[data-theme="dark"] .entry-item:nth-child(even) {
+.dark-theme .entry-item:nth-child(even) {
   background: rgba(255, 255, 255, 0.02);
 }
 
-[data-theme="dark"] .entry-item:hover {
+.dark-theme .entry-item:hover {
   background: rgba(74, 144, 226, 0.15);
 }
 
-[data-theme="dark"] .input-row input {
+.dark-theme .input-row input {
   background: var(--background-color);
   border-color: var(--border-color);
 }
 
-[data-theme="dark"] .remove-btn:hover {
+.dark-theme .remove-btn:hover {
   background: rgba(220, 53, 69, 0.2);
 }
 
 /* Dark theme installments */
-[data-theme="dark"] .installments-container {
+.dark-theme .installments-container {
   background: #2d2d2d;
   border-color: #666;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .installments-table {
+.dark-theme .installments-table {
   background: #2d2d2d;
 }
 
-[data-theme="dark"] .installments-table thead th {
+.dark-theme .installments-table thead th {
   background: #1a5f7a;
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .installments-table tbody td {
+.dark-theme .installments-table tbody td {
   color: #e0e0e0;
   border-bottom-color: #666;
 }
 
-[data-theme="dark"] .installments-table tbody tr:nth-child(even) {
+.dark-theme .installments-table tbody tr:nth-child(even) {
   background: #3d3d3d;
 }
 
-[data-theme="dark"] .installments-table tbody tr:nth-child(odd) {
+.dark-theme .installments-table tbody tr:nth-child(odd) {
   background: #2d2d2d;
 }
 
-[data-theme="dark"] .installments-table tbody tr:hover {
+.dark-theme .installments-table tbody tr:hover {
   background: #4d4d4d;
 }
 
-[data-theme="dark"] .installment-amount.debit {
+.dark-theme .installment-amount.debit {
   color: #fc8181;
 }
 
-[data-theme="dark"] .installment-amount.credit {
+.dark-theme .installment-amount.credit {
   color: #68d391;
 }
 
-[data-theme="dark"] .installment-duration {
+.dark-theme .installment-duration {
   color: #4a90e2;
 }
 
-[data-theme="dark"] .installment-person {
+.dark-theme .installment-person {
   color: #4dabf7;
 }
 
 /* Dark theme installments header */
-[data-theme="dark"] .installments-header {
+.dark-theme .installments-header {
   background: #2d2d2d;
   border-color: #666;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .installments-header.clickable:hover {
+.dark-theme .installments-header.clickable:hover {
   background: #3d3d3d;
 }
 
-[data-theme="dark"] .installments-header.clickable:focus {
+.dark-theme .installments-header.clickable:focus {
   outline-color: #4a90e2;
 }
 
-[data-theme="dark"] .installments-header h3 {
+.dark-theme .installments-header h3 {
   color: #4a90e2;
 }
 
-[data-theme="dark"] .installments-summary {
+.dark-theme .installments-summary {
   color: #a0a0a0;
 }
 
-[data-theme="dark"] .installment-desc {
+.dark-theme .installment-desc {
   color: #e0e0e0;
+}
+
+/* Dark theme finance container */
+.dark-theme .finance-container {
+  background: var(--background-color);
+  color: var(--text-color);
+}
+
+.dark-theme .finance-container h3 {
+  color: #4a90e2;
+}
+
+.dark-theme .finance-container p {
+  color: #a0a0a0;
 }

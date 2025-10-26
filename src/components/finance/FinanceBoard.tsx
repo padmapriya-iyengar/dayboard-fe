@@ -183,7 +183,9 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   };
 
   const getCurrencySymbol = (currency: string) => {
-    return currency === "AED" ? "DH" : currency;
+    if (currency === "AED") return "ﺩ.ﺇ";
+    if (currency === "INR") return "₹";
+    return currency;
   };
 
   // Toggle account collapse state
@@ -267,8 +269,14 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                         <div className="expenses-total">
                           Total:{" "}
                           <strong>
-                            {currencySymbol}
-                            {accountTotal.toFixed(2)}
+                            {accountCurrency === "AED" ? (
+                              <>
+                                <span className="dirham-symbol">&#xea;</span>{" "}
+                                {accountTotal.toFixed(2)}
+                              </>
+                            ) : (
+                              `${currencySymbol} ${accountTotal.toFixed(2)}`
+                            )}
                           </strong>
                         </div>
                       </button>
@@ -313,8 +321,18 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                                     }`}
                                   >
                                     {expense.isDebit ? "-" : "+"}
-                                    {getCurrencySymbol(expense.Currency)}
-                                    {expense.Amount.toFixed(2)}
+                                    {expense.Currency === "AED" ? (
+                                      <>
+                                        <span className="dirham-symbol">
+                                          &#xea;
+                                        </span>{" "}
+                                        {expense.Amount.toFixed(2)}
+                                      </>
+                                    ) : (
+                                      `${getCurrencySymbol(
+                                        expense.Currency
+                                      )} ${expense.Amount.toFixed(2)}`
+                                    )}
                                   </td>
                                   <td className="expense-person">
                                     {expense.PersonName}
@@ -412,8 +430,18 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                                   }`}
                                 >
                                   {installment.isDebit ? "-" : "+"}
-                                  {getCurrencySymbol(installment.Currency)}
-                                  {installment.Amount.toFixed(2)}
+                                  {installment.Currency === "AED" ? (
+                                    <>
+                                      <span className="dirham-symbol">
+                                        &#xea;
+                                      </span>{" "}
+                                      {installment.Amount.toFixed(2)}
+                                    </>
+                                  ) : (
+                                    `${getCurrencySymbol(
+                                      installment.Currency
+                                    )} ${installment.Amount.toFixed(2)}`
+                                  )}
                                 </td>
                                 <td className="installment-type">
                                   <span
