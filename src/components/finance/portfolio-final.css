@@ -435,12 +435,6 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.account-detail-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .dark-theme .account-detail-card {
@@ -448,39 +442,41 @@
   border: 1px solid #64748b;
 }
 
-.account-header {
+.account-toggle-btn {
+  width: 100%;
+  background: none;
+  border: none;
   padding: 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.dark-theme .account-header {
-  background: linear-gradient(135deg, #334155 0%, #475569 100%);
-  border-bottom: 1px solid #64748b;
-}
-
-.account-header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.account-header-content h4 {
+.account-toggle-btn:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.dark-theme .account-toggle-btn:hover {
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+}
+
+.account-toggle-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-toggle-header h4 {
   font-size: 1.125rem;
   font-weight: 600;
   color: #1e293b;
   margin: 0;
 }
 
-.dark-theme .account-header-content h4 {
+.dark-theme .account-toggle-header h4 {
   color: #f1f5f9;
-}
-
-.account-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .currency-badge {
@@ -499,6 +495,12 @@
 .currency-badge.inr {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: white;
+}
+
+.account-toggle-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .transaction-count {
@@ -526,11 +528,13 @@
 
 .account-breakdown {
   padding: 20px;
-  background: white;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid #e2e8f0;
 }
 
 .dark-theme .account-breakdown {
-  background: #475569;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-top: 1px solid #64748b;
 }
 
 .breakdown-stats {

@@ -192,12 +192,6 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     return accountExpenses.length > 0 ? accountExpenses[0].Currency : "AED";
   };
 
-  const getCurrencySymbol = (currency: string) => {
-    if (currency === "AED") return "ﺩ.ﺇ";
-    if (currency === "INR") return "₹";
-    return currency;
-  };
-
   // Toggle account collapse state
   const toggleAccountCollapse = (accountName: string) => {
     setCollapsedAccounts((prev) => {
@@ -230,203 +224,302 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   };
 
   return (
-    <div className="finance-container">
+    <div className="finance-dashboard">
       {subTab === "summary" ? (
         <PortfolioSummary />
       ) : (
         <>
-          <h3>{getTitle()}</h3>
+          {/* Header Section */}
+          <div className="finance-header">
+            <div className="person-profile">
+              <div className="person-avatar-large">
+                {(subTab || defaultPerson).charAt(0).toUpperCase()}
+              </div>
+              <div className="person-details">
+                <h1 className="person-title">{getTitle()}</h1>
+                <p className="person-subtitle">Personal Financial Overview</p>
+              </div>
+            </div>
+            <div className="finance-stats">
+              <div className="stat-card accounts-stat">
+                <div className="stat-icon">🏦</div>
+                <div className="stat-info">
+                  <div className="stat-value">
+                    {Object.keys(expensesByAccount).length}
+                  </div>
+                  <div className="stat-label">Active Accounts</div>
+                </div>
+              </div>
+              <div className="stat-card transactions-stat">
+                <div className="stat-icon">📊</div>
+                <div className="stat-info">
+                  <div className="stat-value">{filteredExpenses.length}</div>
+                  <div className="stat-label">Transactions</div>
+                </div>
+              </div>
+              <div className="stat-card installments-stat">
+                <div className="stat-icon">💰</div>
+                <div className="stat-info">
+                  <div className="stat-value">
+                    {filteredInstallments.length}
+                  </div>
+                  <div className="stat-label">Installments</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          {/* Expenses by Account - Full Width */}
-          {isLoadingExpenses && (
-            <div className="loading-state">Loading expenses...</div>
-          )}
+          {/* Accounts Section */}
+          <div className="accounts-table-section">
+            <h2 className="section-title">
+              <span className="section-icon">💳</span> Account Overview
+            </h2>
 
-          {!isLoadingExpenses &&
-            Object.keys(expensesByAccount).length === 0 && (
-              <div className="empty-state">
-                <span>No expenses found for {getDescription()}</span>
+            {isLoadingExpenses && (
+              <div className="loading-state">
+                <div className="loading-spinner"></div>
+                <p>Loading financial data...</p>
               </div>
             )}
 
-          {!isLoadingExpenses && Object.keys(expensesByAccount).length > 0 && (
-            <div className="accounts-container">
-              {Object.entries(expensesByAccount)
-                .sort(([, accountExpensesA], [, accountExpensesB]) => {
-                  const currencyA = getAccountCurrency(accountExpensesA);
-                  const currencyB = getAccountCurrency(accountExpensesB);
+            {!isLoadingExpenses &&
+              Object.keys(expensesByAccount).length === 0 && (
+                <div className="empty-state">
+                  <div className="empty-icon">📊</div>
+                  <h3>No Financial Data</h3>
+                  <p>No expenses found for {getDescription()}</p>
+                </div>
+              )}
 
-                  // Sort by currency: AED first, then INR, then others
-                  const currencyOrder = { AED: 0, INR: 1 };
-                  const orderA =
-                    currencyOrder[currencyA as keyof typeof currencyOrder] ?? 2;
-                  const orderB =
-                    currencyOrder[currencyB as keyof typeof currencyOrder] ?? 2;
+            {!isLoadingExpenses &&
+              Object.keys(expensesByAccount).length > 0 && (
+                <div className="accounts-table-container">
+                  {Object.entries(expensesByAccount)
+                    .sort(([, accountExpensesA], [, accountExpensesB]) => {
+                      const currencyA = getAccountCurrency(accountExpensesA);
+                      const currencyB = getAccountCurrency(accountExpensesB);
 
-                  return orderA - orderB;
-                })
-                .map(([accountName, accountExpenses]) => {
-                  const accountTotal = getAccountTotal(accountExpenses);
-                  const accountCurrency = getAccountCurrency(accountExpenses);
-                  const currencySymbol = getCurrencySymbol(accountCurrency);
-                  const isCollapsed = collapsedAccounts.has(accountName);
+                      // Sort by currency: AED first, then INR, then others
+                      const currencyOrder = { AED: 0, INR: 1 };
+                      const orderA =
+                        currencyOrder[
+                          currencyA as keyof typeof currencyOrder
+                        ] ?? 2;
+                      const orderB =
+                        currencyOrder[
+                          currencyB as keyof typeof currencyOrder
+                        ] ?? 2;
 
-                  return (
-                    <div key={accountName} className="account-section">
-                      <button
-                        className="expenses-header clickable"
-                        onClick={() => toggleAccountCollapse(accountName)}
-                        aria-expanded={!isCollapsed}
-                        aria-controls={`account-${accountName}-content`}
-                      >
-                        <div className="header-left">
-                          <span
-                            className={`collapse-icon ${
-                              isCollapsed ? "collapsed" : ""
-                            }`}
-                          >
-                            ▼
-                          </span>
-                          <h4>{accountName} Account</h4>
-                        </div>
-                        <div className="expenses-total">
-                          Total:{" "}
-                          <strong>
-                            {accountCurrency === "AED" ? (
-                              <>
-                                <span className="dirham-symbol">&#xea;</span>{" "}
-                                {accountTotal.toFixed(2)}
-                              </>
-                            ) : (
-                              `${currencySymbol} ${accountTotal.toFixed(2)}`
-                            )}
-                          </strong>
-                        </div>
-                      </button>
-                      {!isCollapsed && (
+                      return orderA - orderB;
+                    })
+                    .map(([accountName, accountExpenses]) => {
+                      const accountTotal = getAccountTotal(accountExpenses);
+                      const accountCurrency =
+                        getAccountCurrency(accountExpenses);
+                      const isCollapsed = collapsedAccounts.has(accountName);
+
+                      return (
                         <div
-                          className="expenses-table-container"
-                          id={`account-${accountName}-content`}
+                          key={accountName}
+                          className="account-table-section"
                         >
-                          <table className="expenses-table">
-                            <thead>
-                              <tr>
-                                <th>DATE</th>
-                                <th>DESCRIPTION</th>
-                                <th>TYPE</th>
-                                <th>AMOUNT</th>
-                                <th>PERSON</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {accountExpenses.map((expense) => (
-                                <tr key={expense.Id}>
-                                  <td className="expense-date">
-                                    {new Date(
-                                      expense.TxnDate
-                                    ).toLocaleDateString("en-GB")}
-                                  </td>
-                                  <td className="expense-desc">
-                                    {expense.Description}
-                                  </td>
-                                  <td className="expense-type">
-                                    <span
-                                      className={`type-badge ${
-                                        expense.isDebit ? "debit" : "credit"
-                                      }`}
-                                    >
-                                      {expense.isDebit ? "Debit" : "Credit"}
+                          <button
+                            className="account-header clickable"
+                            onClick={() => toggleAccountCollapse(accountName)}
+                            aria-expanded={!isCollapsed}
+                          >
+                            <div className="account-header-left">
+                              <span
+                                className={`collapse-icon ${
+                                  isCollapsed ? "collapsed" : ""
+                                }`}
+                              >
+                                ▼
+                              </span>
+                              <span
+                                className={`currency-flag ${accountCurrency.toLowerCase()}`}
+                              >
+                                {accountCurrency === "AED" ? "🇦🇪" : "🇮🇳"}
+                              </span>
+                              <h4>{accountName}</h4>
+                              <span className="account-meta">
+                                ({accountExpenses.length} transactions)
+                              </span>
+                            </div>
+                            <div className="account-balance-summary">
+                              <span className="balance-label">Balance:</span>
+                              <span
+                                className={`balance-amount ${
+                                  accountTotal >= 0 ? "positive" : "negative"
+                                }`}
+                              >
+                                {accountCurrency === "AED" ? (
+                                  <>
+                                    <span className="dirham-symbol">
+                                      &#xea;
                                     </span>
-                                  </td>
-                                  <td
-                                    className={`expense-amount ${
-                                      expense.isDebit ? "debit" : "credit"
-                                    }`}
-                                  >
-                                    {expense.isDebit ? "-" : "+"}
-                                    {expense.Currency === "AED" ? (
-                                      <>
-                                        <span className="dirham-symbol">
-                                          &#xea;
-                                        </span>{" "}
-                                        {expense.Amount.toFixed(2)}
-                                      </>
-                                    ) : (
-                                      `${getCurrencySymbol(
-                                        expense.Currency
-                                      )} ${expense.Amount.toFixed(2)}`
+                                    {Math.abs(accountTotal).toLocaleString(
+                                      "en-US",
+                                      {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                      }
                                     )}
-                                  </td>
-                                  <td className="expense-person">
-                                    {expense.PersonName}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                                  </>
+                                ) : (
+                                  `₹ ${Math.abs(accountTotal).toLocaleString(
+                                    "en-US",
+                                    {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    }
+                                  )}`
+                                )}
+                              </span>
+                            </div>
+                          </button>
+
+                          {!isCollapsed && (
+                            <div className="account-table-container">
+                              <div className="transactions-table-wrapper">
+                                <table className="transactions-table">
+                                  <thead>
+                                    <tr>
+                                      <th>Date</th>
+                                      <th>Description</th>
+                                      <th>Type</th>
+                                      <th>Amount ({accountCurrency})</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {(() => {
+                                      const sortedExpenses = [
+                                        ...accountExpenses,
+                                      ].sort(
+                                        (a, b) =>
+                                          new Date(b.TxnDate).getTime() -
+                                          new Date(a.TxnDate).getTime()
+                                      );
+                                      return sortedExpenses.map((expense) => (
+                                        <tr key={expense.Id}>
+                                          <td className="expense-date">
+                                            {new Date(
+                                              expense.TxnDate
+                                            ).toLocaleDateString("en-GB")}
+                                          </td>
+                                          <td className="expense-desc">
+                                            {expense.Description}
+                                          </td>
+                                          <td className="expense-type">
+                                            <span
+                                              className={`type-badge ${
+                                                expense.isDebit
+                                                  ? "debit"
+                                                  : "credit"
+                                              }`}
+                                            >
+                                              {expense.isDebit
+                                                ? "Debit"
+                                                : "Credit"}
+                                            </span>
+                                          </td>
+                                          <td
+                                            className={`expense-amount ${
+                                              expense.isDebit
+                                                ? "debit"
+                                                : "credit"
+                                            }`}
+                                          >
+                                            {expense.isDebit ? "-" : "+"}
+                                            {expense.Currency === "AED" ? (
+                                              <>
+                                                <span className="dirham-symbol">
+                                                  &#xea;
+                                                </span>
+                                                {expense.Amount.toLocaleString(
+                                                  "en-US",
+                                                  {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                  }
+                                                )}
+                                              </>
+                                            ) : (
+                                              `₹ ${expense.Amount.toLocaleString(
+                                                "en-US",
+                                                {
+                                                  minimumFractionDigits: 2,
+                                                  maximumFractionDigits: 2,
+                                                }
+                                              )}`
+                                            )}
+                                          </td>
+                                        </tr>
+                                      ));
+                                    })()}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          )}
+                      );
+                    })}
+                </div>
+              )}
+          </div>
 
           {/* Installments Section */}
-          <div className="installments-section">
-            <button
-              className="installments-header clickable"
-              onClick={toggleInstallmentsCollapse}
-              aria-expanded={!isInstallmentsCollapsed}
-              aria-controls="installments-content"
-            >
-              <div className="header-left">
+          <div className="installments-table-section">
+            <div className="installments-header">
+              <h2 className="section-title">
+                <span className="section-icon">🏛️</span> Monthly Installments
+              </h2>
+              <button
+                className="installments-toggle"
+                onClick={toggleInstallmentsCollapse}
+                aria-expanded={!isInstallmentsCollapsed}
+              >
                 <span
-                  className={`collapse-icon ${
+                  className={`toggle-icon ${
                     isInstallmentsCollapsed ? "collapsed" : ""
                   }`}
                 >
                   ▼
                 </span>
-                <h3>Monthly Installments</h3>
-              </div>
-              <div className="installments-summary">
-                {!isLoadingInstallments && filteredInstallments.length > 0 && (
-                  <span>
-                    {filteredInstallments.length} installment
-                    {filteredInstallments.length !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </div>
-            </button>
+              </button>
+            </div>
 
             {!isInstallmentsCollapsed && (
-              <div id="installments-content">
+              <div className="installments-content">
                 {isLoadingInstallments && (
-                  <div className="loading-state">Loading installments...</div>
+                  <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p>Loading installments...</p>
+                  </div>
                 )}
 
                 {!isLoadingInstallments &&
                   filteredInstallments.length === 0 && (
                     <div className="empty-state">
-                      <span>No installments found for {getDescription()}</span>
+                      <div className="empty-icon">💰</div>
+                      <h3>No Installments</h3>
+                      <p>No installments found for {getDescription()}</p>
                     </div>
                   )}
 
                 {!isLoadingInstallments && filteredInstallments.length > 0 && (
-                  <div className="installments-container">
-                    <div className="installments-table-container">
-                      <table className="installments-table">
+                  <div className="installments-table-container">
+                    <div className="transactions-table-wrapper">
+                      <table className="transactions-table">
                         <thead>
                           <tr>
-                            <th>ACCOUNT</th>
-                            <th>DESCRIPTION</th>
-                            <th>AMOUNT</th>
-                            <th>TYPE</th>
-                            <th>START DATE</th>
-                            <th>END DATE</th>
-                            <th>DURATION</th>
-                            <th>PERSON</th>
+                            <th>Account</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Duration</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -441,6 +534,13 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                             return (
                               <tr key={installment.Id}>
                                 <td className="installment-account">
+                                  <span
+                                    className={`currency-flag ${installment.Currency.toLowerCase()}`}
+                                  >
+                                    {installment.Currency === "AED"
+                                      ? "🇦🇪"
+                                      : "🇮🇳"}
+                                  </span>
                                   {installment.AccountName}
                                 </td>
                                 <td className="installment-desc">
@@ -456,35 +556,35 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                                     <>
                                       <span className="dirham-symbol">
                                         &#xea;
-                                      </span>{" "}
-                                      {installment.Amount.toFixed(2)}
+                                      </span>
+                                      {installment.Amount.toLocaleString(
+                                        "en-US",
+                                        {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                        }
+                                      )}
                                     </>
                                   ) : (
-                                    `${getCurrencySymbol(
-                                      installment.Currency
-                                    )} ${installment.Amount.toFixed(2)}`
+                                    `₹ ${installment.Amount.toLocaleString(
+                                      "en-US",
+                                      {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                      }
+                                    )}`
                                   )}
                                 </td>
-                                <td className="installment-type">
-                                  <span
-                                    className={`type-badge ${
-                                      installment.isDebit ? "debit" : "credit"
-                                    }`}
-                                  >
-                                    {installment.isDebit ? "Debit" : "Credit"}
-                                  </span>
-                                </td>
-                                <td className="installment-start-date">
+                                <td className="installment-date">
                                   {startDate.toLocaleDateString("en-GB")}
                                 </td>
-                                <td className="installment-end-date">
+                                <td className="installment-date">
                                   {endDate.toLocaleDateString("en-GB")}
                                 </td>
                                 <td className="installment-duration">
-                                  {durationMonths} months
-                                </td>
-                                <td className="installment-person">
-                                  {installment.PersonName}
+                                  <span className="duration-badge">
+                                    {durationMonths} months
+                                  </span>
                                 </td>
                               </tr>
                             );

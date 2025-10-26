@@ -77,6 +77,9 @@ function PortfolioSummary() {
   const [collapsedPersons, setCollapsedPersons] = useState<Set<number>>(
     new Set()
   );
+  const [collapsedAccounts, setCollapsedAccounts] = useState<Set<number>>(
+    new Set()
+  );
 
   // Fetch portfolio data from API
   useEffect(() => {
@@ -96,6 +99,12 @@ function PortfolioSummary() {
               (p) => p.personId
             );
             setCollapsedPersons(new Set(personIds));
+
+            // Set all accounts as collapsed by default
+            const accountIds = responseData.data.portfolios.flatMap((p) =>
+              p.accounts.map((a) => a.accountId)
+            );
+            setCollapsedAccounts(new Set(accountIds));
           } else {
             setError("Invalid response format");
           }
@@ -120,6 +129,18 @@ function PortfolioSummary() {
         newSet.delete(personId);
       } else {
         newSet.add(personId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleAccountCollapse = (accountId: number) => {
+    setCollapsedAccounts((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(accountId)) {
+        newSet.delete(accountId);
+      } else {
+        newSet.add(accountId);
       }
       return newSet;
     });
@@ -311,17 +332,6 @@ function PortfolioSummary() {
         </h2>
         {portfolios.map((portfolio) => {
           const isCollapsed = collapsedPersons.has(portfolio.personId);
-
-          // Sort accounts by currency: AED first, then INR
-          const sortedAccounts = [...portfolio.accounts].sort((a, b) => {
-            const currencyOrder = { AED: 0, INR: 1 };
-            const orderA =
-              currencyOrder[a.currency as keyof typeof currencyOrder] ?? 2;
-            const orderB =
-              currencyOrder[b.currency as keyof typeof currencyOrder] ?? 2;
-            return orderA - orderB;
-          });
-
           return (
             <div key={portfolio.personId} className="person-accounts">
               <button
@@ -365,66 +375,57 @@ function PortfolioSummary() {
 
               {!isCollapsed && (
                 <div className="accounts-grid">
-                  {sortedAccounts.map((account) => {
-                    return (
-                      <div
-                        key={account.accountId}
-                        className="account-detail-card"
-                      >
-                        <div className="account-header">
-                          <div className="account-header-content">
-                            <h4>{account.accountName}</h4>
-                            <span
-                              className={`currency-badge ${account.currency.toLowerCase()}`}
-                            >
-                              {account.currency}
-                            </span>
-                          </div>
-                          <div className="account-summary">
-                            <span className="transaction-count">
-                              {account.amounts.expenseCount} transactions
-                            </span>
-                            <span
-                              className={`net-amount ${
-                                account.amounts.netAmount >= 0
-                                  ? "positive"
-                                  : "negative"
-                              }`}
-                            >
-                              {formatCurrency(
-                                account.amounts.netAmount,
-                                account.currency
-                              )}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="account-breakdown">
-                          <div className="breakdown-stats">
-                            <div className="stat-item">
-                              <span className="stat-label">Total Credits</span>
-                              <span className="stat-value credit">
-                                +
-                                {formatCurrency(
-                                  account.amounts.creditAmount,
-                                  account.currency
-                                )}
-                              </span>
-                            </div>
-                            <div className="stat-item">
-                              <span className="stat-label">Total Debits</span>
-                              <span className="stat-value debit">
-                                -
-                                {formatCurrency(
-                                  account.amounts.debitAmount,
-                                  account.currency
-                                )}
-                              </span>
-                            </div>
-                            <div className="stat-item">
-                              <span className="stat-label">Net Balance</span>
+                  {portfolio.accounts
+                    .sort((a, b) => {
+                      // Sort by currency: AED first, then INR
+                      const currencyOrder = { AED: 0, INR: 1 };
+                      const orderA =
+                        currencyOrder[
+                          a.currency as keyof typeof currencyOrder
+                        ] ?? 2;
+                      const orderB =
+                        currencyOrder[
+                          b.currency as keyof typeof currencyOrder
+                        ] ?? 2;
+                      return orderA - orderB;
+                    })
+                    .map((account) => {
+                      const isAccountCollapsed = collapsedAccounts.has(
+                        account.accountId
+                      );
+                      return (
+                        <div
+                          key={account.accountId}
+                          className="account-detail-card"
+                        >
+                          <button
+                            className="account-toggle-btn"
+                            onClick={() =>
+                              toggleAccountCollapse(account.accountId)
+                            }
+                            aria-expanded={!isAccountCollapsed}
+                          >
+                            <div className="account-toggle-header">
                               <span
-                                className={`stat-value ${
+                                className={`toggle-icon ${
+                                  isAccountCollapsed ? "collapsed" : ""
+                                }`}
+                              >
+                                ▼
+                              </span>
+                              <h4>{account.accountName}</h4>
+                              <span
+                                className={`currency-badge ${account.currency.toLowerCase()}`}
+                              >
+                                {account.currency}
+                              </span>
+                            </div>
+                            <div className="account-toggle-summary">
+                              <span className="transaction-count">
+                                {account.amounts.expenseCount} transactions
+                              </span>
+                              <span
+                                className={`net-amount ${
                                   account.amounts.netAmount >= 0
                                     ? "positive"
                                     : "negative"
@@ -436,17 +437,66 @@ function PortfolioSummary() {
                                 )}
                               </span>
                             </div>
-                            <div className="stat-item">
-                              <span className="stat-label">Transactions</span>
-                              <span className="stat-value neutral">
-                                {account.amounts.expenseCount}
-                              </span>
+                          </button>
+
+                          {!isAccountCollapsed && (
+                            <div className="account-breakdown">
+                              <div className="breakdown-stats">
+                                <div className="stat-item">
+                                  <span className="stat-label">
+                                    Total Credits
+                                  </span>
+                                  <span className="stat-value credit">
+                                    +
+                                    {formatCurrency(
+                                      account.amounts.creditAmount,
+                                      account.currency
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="stat-item">
+                                  <span className="stat-label">
+                                    Total Debits
+                                  </span>
+                                  <span className="stat-value debit">
+                                    -
+                                    {formatCurrency(
+                                      account.amounts.debitAmount,
+                                      account.currency
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="stat-item">
+                                  <span className="stat-label">
+                                    Net Balance
+                                  </span>
+                                  <span
+                                    className={`stat-value ${
+                                      account.amounts.netAmount >= 0
+                                        ? "positive"
+                                        : "negative"
+                                    }`}
+                                  >
+                                    {formatCurrency(
+                                      account.amounts.netAmount,
+                                      account.currency
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="stat-item">
+                                  <span className="stat-label">
+                                    Transactions
+                                  </span>
+                                  <span className="stat-value neutral">
+                                    {account.amounts.expenseCount}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               )}
             </div>
