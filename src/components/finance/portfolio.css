@@ -119,6 +119,45 @@
   font-weight: 600;
 }
 
+/* Person Financial Card Styles */
+.person-financial-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e1;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.person-financial-card h4 {
+  margin: 0 0 20px 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.currency-section {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.currency-section.inr {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
+}
+
+.currency-section h5 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
 .amounts-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -517,6 +556,28 @@
 .dark-theme .currency-card {
   background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
   border: 1px solid #4a5568;
+}
+
+.dark-theme .person-financial-card {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border: 2px solid #4a5568;
+}
+
+.dark-theme .person-financial-card h4 {
+  color: #e2e8f0;
+  border-bottom-color: #4a5568;
+}
+
+.dark-theme .currency-section {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+
+.dark-theme .currency-section.inr {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+}
+
+.dark-theme .currency-section h5 {
+  color: #f7fafc;
 }
 
 .dark-theme .currency-card h4 {

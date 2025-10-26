@@ -198,71 +198,79 @@ function PortfolioSummary() {
         </div>
       </div>
 
-      {/* Grand Totals */}
+      {/* Person-wise Financial Position */}
       <div className="grand-totals">
-        <h3>💰 Overall Financial Position</h3>
+        <h3>💰 Individual Financial Position</h3>
         <div className="currency-grid">
-          <div className="currency-card aed">
-            <h4>
-              <span className="dirham-symbol">&#xea;</span> UAE Dirham (AED)
-            </h4>
-            <div className="amounts-grid">
-              <div className="amount-item credit">
-                <span className="label">Total Credits</span>
-                <span className="value">
-                  {formatCurrency(summary.grandTotals.aed.creditAmount, "AED")}
-                </span>
-              </div>
-              <div className="amount-item debit">
-                <span className="label">Total Debits</span>
-                <span className="value">
-                  {formatCurrency(summary.grandTotals.aed.debitAmount, "AED")}
-                </span>
-              </div>
-              <div className="amount-item net">
-                <span className="label">Net Amount</span>
-                <span
-                  className={`value ${
-                    summary.grandTotals.aed.netAmount >= 0
-                      ? "positive"
-                      : "negative"
-                  }`}
-                >
-                  {formatCurrency(summary.grandTotals.aed.netAmount, "AED")}
-                </span>
-              </div>
-            </div>
-          </div>
+          {portfolios.map((portfolio) => (
+            <div key={portfolio.personId} className="person-financial-card">
+              <h4>👤 {portfolio.personName}'s Portfolio</h4>
 
-          <div className="currency-card inr">
-            <h4>₹ Indian Rupee (INR)</h4>
-            <div className="amounts-grid">
-              <div className="amount-item credit">
-                <span className="label">Total Credits</span>
-                <span className="value">
-                  {formatCurrency(summary.grandTotals.inr.creditAmount, "INR")}
-                </span>
+              {/* AED Totals */}
+              <div className="currency-section aed">
+                <h5>
+                  <span className="dirham-symbol">&#xea;</span> UAE Dirham (AED)
+                </h5>
+                <div className="amounts-grid">
+                  <div className="amount-item credit">
+                    <span className="label">Total Credits</span>
+                    <span className="value">
+                      {formatCurrency(portfolio.totals.aed.creditAmount, "AED")}
+                    </span>
+                  </div>
+                  <div className="amount-item debit">
+                    <span className="label">Total Debits</span>
+                    <span className="value">
+                      {formatCurrency(portfolio.totals.aed.debitAmount, "AED")}
+                    </span>
+                  </div>
+                  <div className="amount-item net">
+                    <span className="label">Net Amount</span>
+                    <span
+                      className={`value ${
+                        portfolio.totals.aed.netAmount >= 0
+                          ? "positive"
+                          : "negative"
+                      }`}
+                    >
+                      {formatCurrency(portfolio.totals.aed.netAmount, "AED")}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="amount-item debit">
-                <span className="label">Total Debits</span>
-                <span className="value">
-                  {formatCurrency(summary.grandTotals.inr.debitAmount, "INR")}
-                </span>
-              </div>
-              <div className="amount-item net">
-                <span className="label">Net Amount</span>
-                <span
-                  className={`value ${
-                    summary.grandTotals.inr.netAmount >= 0
-                      ? "positive"
-                      : "negative"
-                  }`}
-                >
-                  {formatCurrency(summary.grandTotals.inr.netAmount, "INR")}
-                </span>
+
+              {/* INR Totals */}
+              <div className="currency-section inr">
+                <h5>₹ Indian Rupee (INR)</h5>
+                <div className="amounts-grid">
+                  <div className="amount-item credit">
+                    <span className="label">Total Credits</span>
+                    <span className="value">
+                      {formatCurrency(portfolio.totals.inr.creditAmount, "INR")}
+                    </span>
+                  </div>
+                  <div className="amount-item debit">
+                    <span className="label">Total Debits</span>
+                    <span className="value">
+                      {formatCurrency(portfolio.totals.inr.debitAmount, "INR")}
+                    </span>
+                  </div>
+                  <div className="amount-item net">
+                    <span className="label">Net Amount</span>
+                    <span
+                      className={`value ${
+                        portfolio.totals.inr.netAmount >= 0
+                          ? "positive"
+                          : "negative"
+                      }`}
+                    >
+                      {formatCurrency(portfolio.totals.inr.netAmount, "INR")}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
