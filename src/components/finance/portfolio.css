@@ -217,7 +217,13 @@
   border-radius: 12px;
   overflow: hidden;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.person-portfolio:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .portfolio-header-btn {
@@ -328,10 +334,11 @@
 .account-card {
   background: white;
   border-radius: 12px;
-  padding: 18px;
+  padding: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #e9ecef;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
 .account-card:hover {
@@ -339,11 +346,47 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-.account-header {
+.account-header-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+}
+
+.account-header-btn:hover {
+  background: #f8fafc;
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
+}
+
+.transaction-count {
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.account-details {
+  padding: 0 18px 18px 18px;
+  border-top: 1px solid #e2e8f0;
 }
 
 .account-header h5 {
@@ -488,6 +531,23 @@
   border-color: #4a5568;
 }
 
+.dark-theme .account-header-btn:hover {
+  background: #1a202c;
+}
+
+.dark-theme .account-header h5 {
+  color: #e2e8f0;
+}
+
+.dark-theme .transaction-count {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-theme .account-details {
+  border-top-color: #4a5568;
+}
+
 .dark-theme .total-card {
   background: #2d3748;
   border-color: #4a5568;
@@ -614,10 +674,6 @@
   color: #cbd5e1;
 }
 
-.dark-theme .account-header h5 {
-  color: #f7fafc;
-}
-
 .dark-theme .total-card h5 {
   color: #f7fafc;
 }
@@ -638,6 +694,7 @@
 .dark-theme .person-portfolio {
   background: #2d3748;
   border-color: #4a5568;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .dark-theme .header-left h4 {

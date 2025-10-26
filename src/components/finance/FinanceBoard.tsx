@@ -60,6 +60,16 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
             Array.isArray(responseData.data)
           ) {
             setExpenses(responseData.data);
+
+            // Set all accounts as collapsed by default
+            const accountNames = [
+              ...new Set(
+                responseData.data.map(
+                  (expense: ExpenseEntry) => expense.AccountName
+                )
+              ),
+            ];
+            setCollapsedAccounts(new Set(accountNames as string[]));
           } else {
             console.warn(
               "Expenses API response structure is not as expected:",
@@ -241,8 +251,21 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
 
           {!isLoadingExpenses && Object.keys(expensesByAccount).length > 0 && (
             <div className="accounts-container">
-              {Object.entries(expensesByAccount).map(
-                ([accountName, accountExpenses]) => {
+              {Object.entries(expensesByAccount)
+                .sort(([, accountExpensesA], [, accountExpensesB]) => {
+                  const currencyA = getAccountCurrency(accountExpensesA);
+                  const currencyB = getAccountCurrency(accountExpensesB);
+
+                  // Sort by currency: AED first, then INR, then others
+                  const currencyOrder = { AED: 0, INR: 1 };
+                  const orderA =
+                    currencyOrder[currencyA as keyof typeof currencyOrder] ?? 2;
+                  const orderB =
+                    currencyOrder[currencyB as keyof typeof currencyOrder] ?? 2;
+
+                  return orderA - orderB;
+                })
+                .map(([accountName, accountExpenses]) => {
                   const accountTotal = getAccountTotal(accountExpenses);
                   const accountCurrency = getAccountCurrency(accountExpenses);
                   const currencySymbol = getCurrencySymbol(accountCurrency);
@@ -345,8 +368,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                       )}
                     </div>
                   );
-                }
-              )}
+                })}
             </div>
           )}
 

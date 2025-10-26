@@ -41,16 +41,23 @@
 .accounts-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
-/* Account Section */
+/* Account Section - Professional Theme */
 .account-section {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.account-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  border-color: #cbd5e1;
 }
 
 /* Expenses Table Section - Full Width */
@@ -61,30 +68,31 @@
 }
 
 .expenses-header {
+  width: 100%;
+  padding: 20px;
+  border: none;
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  color: white;
+  text-align: left;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px 12px 20px;
-  border-bottom: 1px solid var(--border-color);
-  background: #f8f9fa;
-  border: none;
-  width: 100%;
-  text-align: left;
+  transition: background 0.3s ease;
 }
 
 .expenses-header.clickable {
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease;
 }
 
-.expenses-header.clickable:hover {
-  background: #e9ecef;
+.expenses-header:hover {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
 }
 
-.expenses-header.clickable:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: -2px;
+.expenses-header:focus {
+  outline: 3px solid rgba(100, 116, 139, 0.3);
+  outline-offset: 2px;
 }
 
 .header-left {
@@ -137,11 +145,9 @@
 }
 
 .expenses-table-container {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .expenses-table {
@@ -296,6 +302,18 @@
 /* Installments Section */
 .installments-section {
   margin-top: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.installments-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  border-color: #cbd5e1;
 }
 
 .installments-section h3 {
@@ -387,36 +405,35 @@
 
 /* Installments Header */
 .installments-header {
+  width: 100%;
+  padding: 20px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  text-align: left;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px 12px 20px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 100%;
-  text-align: left;
-  background: var(--card-background);
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease;
 }
 
 .installments-header.clickable {
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease;
 }
 
 .installments-header.clickable:hover {
-  background: var(--hover-background, #f8f9fa);
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
 }
 
 .installments-header.clickable:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: -2px;
+  outline: 3px solid rgba(99, 102, 241, 0.3);
+  outline-offset: 2px;
 }
 
 .installments-header h3 {
-  color: var(--primary-color);
+  color: white;
   margin: 0;
   font-size: 1.4rem;
   font-weight: 600;
@@ -430,18 +447,47 @@
 
 /* Dark theme section headers */
 .dark-theme .account-section {
-  background: #2d2d2d;
-  border-color: #666;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: #2d3748;
+  border-color: #4a5568;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .account-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-color: #718096;
 }
 
 .dark-theme .expenses-header {
-  background: #555;
-  border-bottom-color: #666;
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
 }
 
 .dark-theme .expenses-header.clickable:hover {
-  background: #666;
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+}
+
+.dark-theme .installments-section {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-theme .installments-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-color: #718096;
+}
+
+.dark-theme .installments-header {
+  background: linear-gradient(135deg, #553c9a 0%, #44337a 100%);
+}
+
+.dark-theme .installments-header.clickable:hover {
+  background: linear-gradient(135deg, #44337a 0%, #322659 100%);
+}
+
+.dark-theme .expenses-table-container {
+  background: #2d3748;
+  border-top-color: #4a5568;
 }
 
 .dark-theme .expenses-header.clickable:focus {
@@ -580,24 +626,6 @@
 }
 
 /* Dark theme installments header */
-.dark-theme .installments-header {
-  background: #2d2d2d;
-  border-color: #666;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.dark-theme .installments-header.clickable:hover {
-  background: #3d3d3d;
-}
-
-.dark-theme .installments-header.clickable:focus {
-  outline-color: #4a90e2;
-}
-
-.dark-theme .installments-header h3 {
-  color: #4a90e2;
-}
-
 .dark-theme .installments-summary {
   color: #a0a0a0;
 }

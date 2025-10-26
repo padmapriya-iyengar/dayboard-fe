@@ -77,6 +77,9 @@ function PortfolioSummary() {
   const [collapsedPersons, setCollapsedPersons] = useState<Set<number>>(
     new Set()
   );
+  const [collapsedAccounts, setCollapsedAccounts] = useState<Set<number>>(
+    new Set()
+  );
 
   // Fetch portfolio data from API
   useEffect(() => {
@@ -91,6 +94,17 @@ function PortfolioSummary() {
 
           if (responseData.status === "success" && responseData.data) {
             setPortfolioData(responseData.data);
+            // Set all persons as collapsed by default
+            const personIds = responseData.data.portfolios.map(
+              (p) => p.personId
+            );
+            setCollapsedPersons(new Set(personIds));
+
+            // Set all accounts as collapsed by default
+            const accountIds = responseData.data.portfolios.flatMap((p) =>
+              p.accounts.map((a) => a.accountId)
+            );
+            setCollapsedAccounts(new Set(accountIds));
           } else {
             setError("Invalid response format");
           }
@@ -115,6 +129,18 @@ function PortfolioSummary() {
         newSet.delete(personId);
       } else {
         newSet.add(personId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleAccountCollapse = (accountId: number) => {
+    setCollapsedAccounts((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(accountId)) {
+        newSet.delete(accountId);
+      } else {
+        newSet.add(accountId);
       }
       return newSet;
     });
@@ -338,59 +364,101 @@ function PortfolioSummary() {
                   </div>
 
                   <div className="accounts-grid">
-                    {portfolio.accounts.map((account) => (
-                      <div key={account.accountId} className="account-card">
-                        <div className="account-header">
-                          <h5>{account.accountName}</h5>
-                          <span className="currency-badge">
-                            {account.currency}
-                          </span>
+                    {portfolio.accounts.map((account) => {
+                      const isAccountCollapsed = collapsedAccounts.has(
+                        account.accountId
+                      );
+                      return (
+                        <div key={account.accountId} className="account-card">
+                          <button
+                            className="account-header-btn"
+                            onClick={() =>
+                              toggleAccountCollapse(account.accountId)
+                            }
+                            aria-expanded={!isAccountCollapsed}
+                          >
+                            <div className="account-header">
+                              <span
+                                className={`collapse-icon ${
+                                  isAccountCollapsed ? "collapsed" : ""
+                                }`}
+                              >
+                                ▼
+                              </span>
+                              <h5>{account.accountName}</h5>
+                              <span className="currency-badge">
+                                {account.currency}
+                              </span>
+                            </div>
+                            <div className="account-summary">
+                              <span className="transaction-count">
+                                {account.amounts.expenseCount} txns
+                              </span>
+                              <span
+                                className={`net-amount ${
+                                  account.amounts.netAmount >= 0
+                                    ? "positive"
+                                    : "negative"
+                                }`}
+                              >
+                                {formatCurrency(
+                                  account.amounts.netAmount,
+                                  account.currency
+                                )}
+                              </span>
+                            </div>
+                          </button>
+
+                          {!isAccountCollapsed && (
+                            <div className="account-details">
+                              <div className="account-stats">
+                                <div className="stat">
+                                  <span className="label">Transactions</span>
+                                  <span className="value">
+                                    {account.amounts.expenseCount}
+                                  </span>
+                                </div>
+                                <div className="stat">
+                                  <span className="label">Net Amount</span>
+                                  <span
+                                    className={`value ${
+                                      account.amounts.netAmount >= 0
+                                        ? "positive"
+                                        : "negative"
+                                    }`}
+                                  >
+                                    {formatCurrency(
+                                      account.amounts.netAmount,
+                                      account.currency
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="account-breakdown">
+                                <div className="breakdown-item credit">
+                                  <span>
+                                    Credits:{" "}
+                                    {formatCurrency(
+                                      account.amounts.creditAmount,
+                                      account.currency
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="breakdown-item debit">
+                                  <span>
+                                    Debits:{" "}
+                                    {formatCurrency(
+                                      account.amounts.debitAmount,
+                                      account.currency
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <div className="account-stats">
-                          <div className="stat">
-                            <span className="label">Transactions</span>
-                            <span className="value">
-                              {account.amounts.expenseCount}
-                            </span>
-                          </div>
-                          <div className="stat">
-                            <span className="label">Net Amount</span>
-                            <span
-                              className={`value ${
-                                account.amounts.netAmount >= 0
-                                  ? "positive"
-                                  : "negative"
-                              }`}
-                            >
-                              {formatCurrency(
-                                account.amounts.netAmount,
-                                account.currency
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="account-breakdown">
-                          <div className="breakdown-item credit">
-                            <span>
-                              Credits:{" "}
-                              {formatCurrency(
-                                account.amounts.creditAmount,
-                                account.currency
-                              )}
-                            </span>
-                          </div>
-                          <div className="breakdown-item debit">
-                            <span>
-                              Debits:{" "}
-                              {formatCurrency(
-                                account.amounts.debitAmount,
-                                account.currency
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
