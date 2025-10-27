@@ -25,6 +25,7 @@ interface InstallmentEntry {
   AccountName: string;
   Currency: string;
   PersonName: string;
+  Type: string;
 }
 
 // Wallet Inquiry Interfaces
@@ -36,6 +37,7 @@ interface WalletInquiry {
   InquiryDate: string;
   PersonName: string;
   AccountName?: string;
+  isDebit: boolean;
 }
 
 interface WalletInquiryResponse {
@@ -264,17 +266,74 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   // Calculate wallet totals in both currencies
   const calculateWalletTotals = () => {
     const aedTotal = filteredWalletInquiries.reduce((sum, inquiry) => {
-      return sum + convertToAED(inquiry.Amount, inquiry.Currency);
+      // Apply isDebit logic: if isDebit is true, make amount negative
+      const amount = inquiry.isDebit ? -inquiry.Amount : inquiry.Amount;
+      return sum + convertToAED(amount, inquiry.Currency);
     }, 0);
 
     const inrTotal = filteredWalletInquiries.reduce((sum, inquiry) => {
-      return sum + convertToINR(inquiry.Amount, inquiry.Currency);
+      // Apply isDebit logic: if isDebit is true, make amount negative
+      const amount = inquiry.isDebit ? -inquiry.Amount : inquiry.Amount;
+      return sum + convertToINR(amount, inquiry.Currency);
     }, 0);
 
     return { aedTotal, inrTotal };
   };
 
+  // Helper function to get effective amount considering isDebit flag
+  const getEffectiveAmount = (inquiry: WalletInquiry) => {
+    return inquiry.isDebit ? -inquiry.Amount : inquiry.Amount;
+  };
+
   const { aedTotal, inrTotal } = calculateWalletTotals();
+
+  // Helper function to get monthly amount based on installment type
+  const getMonthlyAmount = (installment: InstallmentEntry) => {
+    const installmentType = installment.Type?.toUpperCase() || "MONTHLY";
+    let divisor = 1; // Default for MONTHLY
+
+    switch (installmentType) {
+      case "QUARTERLY":
+        divisor = 3;
+        break;
+      case "HALF YEARLY":
+      case "HALF_YEARLY":
+        divisor = 6;
+        break;
+      case "YEARLY":
+        divisor = 12;
+        break;
+      case "MONTHLY":
+      default:
+        // divisor remains 1
+        break;
+    }
+
+    // Apply isDebit logic: if isDebit is true, make amount negative
+    const baseAmount = installment.isDebit
+      ? -installment.Amount
+      : installment.Amount;
+
+    return baseAmount / divisor;
+  };
+
+  // Calculate installment totals in both currencies (normalized to monthly)
+  const calculateInstallmentTotals = () => {
+    const aedTotal = filteredInstallments.reduce((sum, installment) => {
+      const monthlyAmount = getMonthlyAmount(installment);
+      return sum + convertToAED(monthlyAmount, installment.Currency);
+    }, 0);
+
+    const inrTotal = filteredInstallments.reduce((sum, installment) => {
+      const monthlyAmount = getMonthlyAmount(installment);
+      return sum + convertToINR(monthlyAmount, installment.Currency);
+    }, 0);
+
+    return { aedTotal, inrTotal };
+  };
+
+  const { aedTotal: installmentAEDTotal, inrTotal: installmentINRTotal } =
+    calculateInstallmentTotals();
 
   // Get currency for an account (from first expense)
   const getAccountCurrency = (accountExpenses: ExpenseEntry[]) => {
@@ -427,9 +486,60 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
               tabIndex={0}
               aria-expanded={!isAccountsCollapsed}
             >
-              <h2 className="section-title">
-                <span className="section-icon">💳</span> Account Overview
-              </h2>
+              <div className="section-title-with-summary">
+                <h2 className="section-title">
+                  <span className="section-icon">💳</span> Account Overview
+                </h2>
+                {!isLoadingExpenses &&
+                  Object.keys(expensesByAccount).length > 0 && (
+                    <div className="portfolio-summary">
+                      {accountsByCurrency.AED && (
+                        <span className="portfolio-item">
+                          AED Portfolio:{" "}
+                          <span className="dirham-symbol">ê</span>
+                          <span
+                            className={
+                              getCurrencyGroupTotal("AED") >= 0
+                                ? "positive"
+                                : "negative"
+                            }
+                          >
+                            {getCurrencyGroupTotal("AED").toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
+                          </span>
+                        </span>
+                      )}
+                      {accountsByCurrency.AED && accountsByCurrency.INR && (
+                        <span className="portfolio-separator">; </span>
+                      )}
+                      {accountsByCurrency.INR && (
+                        <span className="portfolio-item">
+                          INR Portfolio: ₹
+                          <span
+                            className={
+                              getCurrencyGroupTotal("INR") >= 0
+                                ? "positive"
+                                : "negative"
+                            }
+                          >
+                            {getCurrencyGroupTotal("INR").toLocaleString(
+                              "en-IN",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+              </div>
               <div className="collapse-icon">
                 {isAccountsCollapsed ? "▼" : "▲"}
               </div>
@@ -855,9 +965,47 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
               tabIndex={0}
               aria-expanded={!isInstallmentsCollapsed}
             >
-              <h2 className="section-title">
-                <span className="section-icon">🏛️</span> Monthly Installments
-              </h2>
+              <div className="section-title-with-summary">
+                <h2 className="section-title">
+                  <span className="section-icon">🏛️</span> Installments
+                </h2>
+                {!isLoadingInstallments && filteredInstallments.length > 0 && (
+                  <div className="portfolio-summary">
+                    <span className="portfolio-item">
+                      {filteredInstallments.length} installment
+                      {filteredInstallments.length !== 1 ? "s" : ""}
+                    </span>
+                    <span className="portfolio-separator">; </span>
+                    <span className="portfolio-item">
+                      Monthly AED: <span className="dirham-symbol">ê</span>
+                      <span
+                        className={
+                          installmentAEDTotal >= 0 ? "positive" : "negative"
+                        }
+                      >
+                        {installmentAEDTotal.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                    </span>
+                    <span className="portfolio-separator">; </span>
+                    <span className="portfolio-item">
+                      Monthly INR: ₹
+                      <span
+                        className={
+                          installmentINRTotal >= 0 ? "positive" : "negative"
+                        }
+                      >
+                        {installmentINRTotal.toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="collapse-icon">
                 {isInstallmentsCollapsed ? "▼" : "▲"}
               </div>
@@ -889,6 +1037,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                           <tr>
                             <th>Account</th>
                             <th>Description</th>
+                            <th>Type</th>
                             <th>Amount</th>
                             <th>Start Date</th>
                             <th>End Date</th>
@@ -918,6 +1067,11 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                                 </td>
                                 <td className="installment-desc">
                                   {installment.Description || "No description"}
+                                </td>
+                                <td className="installment-type">
+                                  <span className="type-badge">
+                                    {installment.Type || "MONTHLY"}
+                                  </span>
                                 </td>
                                 <td
                                   className={`installment-amount ${
@@ -983,9 +1137,45 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
               tabIndex={0}
               aria-expanded={!isWalletCollapsed}
             >
-              <h2 className="section-title">
-                <span className="section-icon">💳</span> Wallet Inquiries
-              </h2>
+              <div className="section-title-with-summary">
+                <h2 className="section-title">
+                  <span className="section-icon">💳</span> Wallet Inquiries
+                </h2>
+                {!isLoadingWallet &&
+                  !walletError &&
+                  filteredWalletInquiries.length > 0 && (
+                    <div className="portfolio-summary">
+                      <span className="portfolio-item">
+                        {filteredWalletInquiries.length} inquir
+                        {filteredWalletInquiries.length === 1 ? "y" : "ies"}
+                      </span>
+                      <span className="portfolio-separator">; </span>
+                      <span className="portfolio-item">
+                        AED: <span className="dirham-symbol">ê</span>
+                        <span
+                          className={aedTotal >= 0 ? "positive" : "negative"}
+                        >
+                          {aedTotal.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </span>
+                      <span className="portfolio-separator">; </span>
+                      <span className="portfolio-item">
+                        INR: ₹
+                        <span
+                          className={inrTotal >= 0 ? "positive" : "negative"}
+                        >
+                          {inrTotal.toLocaleString("en-IN", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+              </div>
               <div className="collapse-icon">
                 {isWalletCollapsed ? "▼" : "▲"}
               </div>
@@ -1024,7 +1214,11 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                     <div className="wallet-summary-cards">
                       <div className="wallet-summary-card">
                         <h4>Total in AED</h4>
-                        <div className="amount">
+                        <div
+                          className={`amount ${
+                            aedTotal < 0 ? "negative" : "positive"
+                          }`}
+                        >
                           <span className="dirham-symbol">&#xea;</span>
                           {aedTotal.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
@@ -1034,7 +1228,11 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                       </div>
                       <div className="wallet-summary-card">
                         <h4>Total in INR</h4>
-                        <div className="amount">
+                        <div
+                          className={`amount ${
+                            inrTotal < 0 ? "negative" : "positive"
+                          }`}
+                        >
                           ₹
                           {inrTotal.toLocaleString("en-IN", {
                             minimumFractionDigits: 2,
@@ -1054,6 +1252,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                           <thead>
                             <tr>
                               <th>Description</th>
+                              <th>Type</th>
                               <th>Original Amount</th>
                               <th>AED Equivalent</th>
                               <th>INR Equivalent</th>
@@ -1069,70 +1268,109 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                                   new Date(b.InquiryDate).getTime() -
                                   new Date(a.InquiryDate).getTime()
                               );
-                              return sortedInquiries.map((inquiry) => (
-                                <tr key={inquiry.Id}>
-                                  <td className="inquiry-desc">
-                                    {inquiry.Description}
-                                  </td>
-                                  <td className="inquiry-amount original">
-                                    <span
-                                      className={`currency-flag ${inquiry.Currency.toLowerCase()}`}
+                              return sortedInquiries.map((inquiry) => {
+                                const effectiveAmount =
+                                  getEffectiveAmount(inquiry);
+                                return (
+                                  <tr key={inquiry.Id}>
+                                    <td className="inquiry-desc">
+                                      {inquiry.Description}
+                                    </td>
+                                    <td className="inquiry-type">
+                                      <span
+                                        className={`type-badge ${
+                                          inquiry.isDebit ? "debit" : "credit"
+                                        }`}
+                                      >
+                                        {inquiry.isDebit ? "DEBIT" : "CREDIT"}
+                                      </span>
+                                    </td>
+                                    <td
+                                      className={`inquiry-amount original ${
+                                        effectiveAmount < 0
+                                          ? "negative"
+                                          : "positive"
+                                      }`}
                                     >
-                                      {inquiry.Currency === "AED" ? "🇦🇪" : "🇮🇳"}
-                                    </span>
-                                    {inquiry.Currency === "AED" ? (
-                                      <>
-                                        <span className="dirham-symbol">
-                                          &#xea;
-                                        </span>
-                                        {inquiry.Amount.toLocaleString(
-                                          "en-US",
-                                          {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                          }
-                                        )}
-                                      </>
-                                    ) : (
-                                      <>
-                                        ₹
-                                        {inquiry.Amount.toLocaleString(
-                                          "en-IN",
-                                          {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                          }
-                                        )}
-                                      </>
-                                    )}
-                                  </td>
-                                  <td className="inquiry-amount aed">
-                                    <span className="dirham-symbol">
-                                      &#xea;
-                                    </span>
-                                    {convertToAED(
-                                      inquiry.Amount,
-                                      inquiry.Currency
-                                    ).toLocaleString("en-US", {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    })}
-                                  </td>
-                                  <td className="inquiry-amount inr">
-                                    ₹
-                                    {convertToINR(
-                                      inquiry.Amount,
-                                      inquiry.Currency
-                                    ).toLocaleString("en-IN", {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    })}
-                                  </td>
-                                  <td className="inquiry-account">
-                                    {inquiry.AccountName || "N/A"}
-                                  </td>
-                                </tr>
-                              ));
+                                      <span
+                                        className={`currency-flag ${inquiry.Currency.toLowerCase()}`}
+                                      >
+                                        {inquiry.Currency === "AED"
+                                          ? "🇦🇪"
+                                          : "🇮🇳"}
+                                      </span>
+                                      {inquiry.Currency === "AED" ? (
+                                        <>
+                                          <span className="dirham-symbol">
+                                            &#xea;
+                                          </span>
+                                          {effectiveAmount.toLocaleString(
+                                            "en-US",
+                                            {
+                                              minimumFractionDigits: 2,
+                                              maximumFractionDigits: 2,
+                                            }
+                                          )}
+                                        </>
+                                      ) : (
+                                        <>
+                                          ₹
+                                          {effectiveAmount.toLocaleString(
+                                            "en-IN",
+                                            {
+                                              minimumFractionDigits: 2,
+                                              maximumFractionDigits: 2,
+                                            }
+                                          )}
+                                        </>
+                                      )}
+                                    </td>
+                                    <td
+                                      className={`inquiry-amount aed ${
+                                        convertToAED(
+                                          effectiveAmount,
+                                          inquiry.Currency
+                                        ) < 0
+                                          ? "negative"
+                                          : "positive"
+                                      }`}
+                                    >
+                                      <span className="dirham-symbol">
+                                        &#xea;
+                                      </span>
+                                      {convertToAED(
+                                        effectiveAmount,
+                                        inquiry.Currency
+                                      ).toLocaleString("en-US", {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                      })}
+                                    </td>
+                                    <td
+                                      className={`inquiry-amount inr ${
+                                        convertToINR(
+                                          effectiveAmount,
+                                          inquiry.Currency
+                                        ) < 0
+                                          ? "negative"
+                                          : "positive"
+                                      }`}
+                                    >
+                                      ₹
+                                      {convertToINR(
+                                        effectiveAmount,
+                                        inquiry.Currency
+                                      ).toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                      })}
+                                    </td>
+                                    <td className="inquiry-account">
+                                      {inquiry.AccountName || "N/A"}
+                                    </td>
+                                  </tr>
+                                );
+                              });
                             })()}
                           </tbody>
                         </table>

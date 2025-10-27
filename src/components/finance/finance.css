@@ -1049,3 +1049,108 @@
     max-width: 120px;
   }
 }
+
+/* Positive and Negative Amount Styling */
+.positive {
+  color: #059669 !important;
+}
+
+.negative {
+  color: #dc2626 !important;
+}
+
+.dark-theme .positive {
+  color: #34d399 !important;
+}
+
+.dark-theme .negative {
+  color: #f87171 !important;
+}
+
+/* Inquiry type badges */
+.inquiry-type {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inquiry-type.debit {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.inquiry-type.credit {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.dark-theme .inquiry-type.debit {
+  background-color: #991b1b;
+  color: #fee2e2;
+}
+
+.dark-theme .inquiry-type.credit {
+  background-color: #166534;
+  color: #dcfce7;
+}
+
+/* Portfolio summary in section header */
+.section-title-with-summary {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.portfolio-summary {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b7280;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.portfolio-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.portfolio-separator {
+  margin: 0 4px;
+  font-weight: 400;
+}
+
+.dark-theme .portfolio-summary {
+  color: #9ca3af;
+}
+
+/* Installment type badges */
+.installment-type {
+  text-align: center;
+}
+
+.installment-type .type-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: #e0f2fe;
+  color: #0c4a6e;
+}
+
+.dark-theme .installment-type .type-badge {
+  background-color: #0c4a6e;
+  color: #e0f2fe;
+}
