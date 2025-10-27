@@ -142,7 +142,7 @@
   font-size: 2rem;
   font-weight: 600;
   color: #1e293b;
-  margin: 0 0 24px 0;
+  margin: 0 0 6px 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -718,5 +718,235 @@
   
   .rates-display {
     justify-content: center;
+  }
+}
+
+/* Wallet Inquiries Section */
+.wallet-section {
+  margin-bottom: 32px;
+}
+
+.wallet-summary {
+  margin-bottom: 24px;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.dark-theme .summary-card {
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border: 1px solid #64748b;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.summary-card.total-inquiries {
+  border-left: 4px solid #6366f1;
+}
+
+.summary-card.total-aed {
+  border-left: 4px solid #f59e0b;
+}
+
+.summary-card.total-inr {
+  border-left: 4px solid #10b981;
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.dark-theme .card-value {
+  color: #f1f5f9;
+}
+
+.card-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dark-theme .card-label {
+  color: #94a3b8;
+}
+
+/* Wallet Table Styles */
+.wallet-table-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dark-theme .wallet-table-container {
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border: 1px solid #64748b;
+}
+
+.inquiry-date,
+.inquiry-person,
+.inquiry-account,
+.inquiry-desc {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.dark-theme .inquiry-date,
+.dark-theme .inquiry-person,
+.dark-theme .inquiry-account,
+.dark-theme .inquiry-desc {
+  color: #f1f5f9;
+}
+
+.inquiry-date {
+  color: #64748b;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.dark-theme .inquiry-date {
+  color: #94a3b8;
+}
+
+.inquiry-person {
+  font-weight: 600;
+  color: #6366f1;
+  min-width: 100px;
+}
+
+.dark-theme .inquiry-person {
+  color: #818cf8;
+}
+
+.inquiry-account {
+  color: #64748b;
+  font-style: italic;
+  min-width: 120px;
+}
+
+.dark-theme .inquiry-account {
+  color: #94a3b8;
+}
+
+.inquiry-desc {
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+.inquiry-amount {
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  text-align: right;
+  min-width: 120px;
+  font-size: 0.875rem;
+}
+
+.inquiry-amount.original {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.dark-theme .inquiry-amount.original {
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+}
+
+.inquiry-amount.aed {
+  color: #f59e0b;
+}
+
+.inquiry-amount.inr {
+  color: #10b981;
+}
+
+.wallet-currency-badge {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Error and Loading States for Wallet */
+.wallet-error-state {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  color: #991b1b;
+}
+
+.dark-theme .wallet-error-state {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  border: 1px solid #dc2626;
+  color: #fca5a5;
+}
+
+.wallet-error-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.wallet-error-state p {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+/* Responsive adjustments for wallet section */
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .wallet-table-container .transactions-table th,
+  .wallet-table-container .transactions-table td {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+  
+  .inquiry-amount {
+    min-width: 80px;
+    font-size: 0.75rem;
+  }
+  
+  .wallet-currency-badge {
+    font-size: 0.875rem;
   }
 }
