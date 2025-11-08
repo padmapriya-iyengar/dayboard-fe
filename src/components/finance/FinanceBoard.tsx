@@ -26,6 +26,7 @@ interface InstallmentEntry {
   Currency: string;
   PersonName: string;
   Type: string;
+  Active: boolean;
 }
 
 // Wallet Inquiry Interfaces
@@ -317,17 +318,21 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     return baseAmount / divisor;
   };
 
-  // Calculate installment totals in both currencies (normalized to monthly)
+  // Calculate installment totals in both currencies (normalized to monthly) - only active installments
   const calculateInstallmentTotals = () => {
-    const aedTotal = filteredInstallments.reduce((sum, installment) => {
-      const monthlyAmount = getMonthlyAmount(installment);
-      return sum + convertToAED(monthlyAmount, installment.Currency);
-    }, 0);
+    const aedTotal = filteredInstallments
+      .filter((installment) => installment.Active)
+      .reduce((sum, installment) => {
+        const monthlyAmount = getMonthlyAmount(installment);
+        return sum + convertToAED(monthlyAmount, installment.Currency);
+      }, 0);
 
-    const inrTotal = filteredInstallments.reduce((sum, installment) => {
-      const monthlyAmount = getMonthlyAmount(installment);
-      return sum + convertToINR(monthlyAmount, installment.Currency);
-    }, 0);
+    const inrTotal = filteredInstallments
+      .filter((installment) => installment.Active)
+      .reduce((sum, installment) => {
+        const monthlyAmount = getMonthlyAmount(installment);
+        return sum + convertToINR(monthlyAmount, installment.Currency);
+      }, 0);
 
     return { aedTotal, inrTotal };
   };
@@ -972,8 +977,11 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                 {!isLoadingInstallments && filteredInstallments.length > 0 && (
                   <div className="portfolio-summary">
                     <span className="portfolio-item">
-                      {filteredInstallments.length} installment
-                      {filteredInstallments.length !== 1 ? "s" : ""}
+                      {filteredInstallments.filter((i) => i.Active).length}{" "}
+                      active installment
+                      {filteredInstallments.filter((i) => i.Active).length !== 1
+                        ? "s"
+                        : ""}
                     </span>
                     <span className="portfolio-separator">; </span>
                     <span className="portfolio-item">
@@ -1042,6 +1050,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Duration</th>
+                            <th>Status</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1054,7 +1063,12 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                             );
 
                             return (
-                              <tr key={installment.Id}>
+                              <tr
+                                key={installment.Id}
+                                className={
+                                  !installment.Active ? "inactive-row" : ""
+                                }
+                              >
                                 <td className="installment-account">
                                   <span
                                     className={`currency-flag ${installment.Currency.toLowerCase()}`}
@@ -1111,6 +1125,15 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                                 <td className="installment-duration">
                                   <span className="duration-badge">
                                     {durationMonths} months
+                                  </span>
+                                </td>
+                                <td className="installment-status">
+                                  <span
+                                    className={`status-badge ${
+                                      installment.Active ? "active" : "inactive"
+                                    }`}
+                                  >
+                                    {installment.Active ? "Active" : "Inactive"}
                                   </span>
                                 </td>
                               </tr>
