@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./finance.css";
+import AccountDetails from "./AccountDetails";
 
 interface FinanceBoardProps {
   subTab?: string;
@@ -118,18 +119,15 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   const [isInstallmentsCollapsed, setIsInstallmentsCollapsed] = useState(false);
   const [isWalletCollapsed, setIsWalletCollapsed] = useState(false);
 
-  // Transaction modal states
-  const [selectedAccount, setSelectedAccount] = useState<AccountEntry | null>(
+  // Navigation state
+  const [selectedAccountId, setSelectedAccountId] = useState<number | null>(
     null
   );
-  const [accountTransactions, setAccountTransactions] = useState<
-    ExpenseEntry[]
-  >([]);
-  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
-  const [transactionsError, setTransactionsError] = useState<string | null>(
-    null
-  );
-  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showAccountDetails, setShowAccountDetails] = useState(false);
+
+  // Pagination state for accounts
+  const [currentAccountPage, setCurrentAccountPage] = useState(1);
+  const accountsPerPage = 8;
 
   // Fetch accounts from API
   useEffect(() => {
@@ -252,6 +250,11 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     fetchWalletInquiries();
   }, []);
 
+  // Reset pagination when subTab changes
+  useEffect(() => {
+    setCurrentAccountPage(1);
+  }, [subTab]);
+
   // Filter functions
   const filteredAccounts = accounts.filter((account) => {
     const currentPerson = subTab || defaultPerson;
@@ -267,6 +270,21 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
     const currentPerson = subTab || defaultPerson;
     return inquiry.PersonName.toLowerCase() === currentPerson.toLowerCase();
   });
+
+  // Pagination logic for accounts
+  const getPaginatedAccounts = () => {
+    const startIndex = (currentAccountPage - 1) * accountsPerPage;
+    const endIndex = startIndex + accountsPerPage;
+    return filteredAccounts.slice(startIndex, endIndex);
+  };
+
+  const totalAccountPages = Math.ceil(
+    filteredAccounts.length / accountsPerPage
+  );
+
+  const handleAccountPageChange = (page: number) => {
+    setCurrentAccountPage(page);
+  };
 
   // Helper functions
   const getTitle = () => {
@@ -346,51 +364,26 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
   const { aedTotal: walletAedTotal, inrTotal: walletInrTotal } =
     calculateWalletTotals();
 
-  // Fetch account transactions
-  const fetchAccountTransactions = async (account: AccountEntry) => {
-    setIsLoadingTransactions(true);
-    setTransactionsError(null);
-    setSelectedAccount(account);
-    setShowTransactionModal(true);
-
-    try {
-      const response = await fetch(
-        `http://localhost:3002/api/v1/expenses?Account_Id=${account.Id}`
-      );
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Account Transactions API Response:", responseData);
-
-        if (
-          responseData.status === "success" &&
-          Array.isArray(responseData.data)
-        ) {
-          setAccountTransactions(responseData.data);
-        } else {
-          console.warn(
-            "Transactions API response structure is not as expected:",
-            responseData
-          );
-          setTransactionsError("Invalid response structure");
-        }
-      } else {
-        console.error("Failed to fetch transactions, status:", response.status);
-        setTransactionsError("Failed to fetch transactions");
-      }
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      setTransactionsError("Error fetching transactions");
-    } finally {
-      setIsLoadingTransactions(false);
-    }
+  // Navigation functions
+  const navigateToAccount = (accountId: number) => {
+    setSelectedAccountId(accountId);
+    setShowAccountDetails(true);
   };
 
-  const closeTransactionModal = () => {
-    setShowTransactionModal(false);
-    setSelectedAccount(null);
-    setAccountTransactions([]);
-    setTransactionsError(null);
+  const navigateBackToFinance = () => {
+    setShowAccountDetails(false);
+    setSelectedAccountId(null);
   };
+
+  // Show AccountDetails if an account is selected
+  if (showAccountDetails && selectedAccountId) {
+    return (
+      <AccountDetails
+        accountId={selectedAccountId}
+        onBackToFinance={navigateBackToFinance}
+      />
+    );
+  }
 
   return (
     <div className="finance-dashboard">
@@ -498,7 +491,7 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredAccounts.map((account) => (
+                        {getPaginatedAccounts().map((account) => (
                           <tr key={account.Id}>
                             <td className="account-name">
                               {account.AccountName}
@@ -529,10 +522,8 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                             <td className="actions-cell">
                               <button
                                 className="action-button"
-                                onClick={() =>
-                                  fetchAccountTransactions(account)
-                                }
-                                title="View Transactions"
+                                onClick={() => navigateToAccount(account.Id)}
+                                title="View Account Details"
                               >
                                 📊
                               </button>
@@ -542,6 +533,76 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Accounts Pagination Controls */}
+                  {filteredAccounts.length > accountsPerPage && (
+                    <div className="pagination-controls">
+                      <div className="pagination-info">
+                        <span>
+                          Showing{" "}
+                          {(currentAccountPage - 1) * accountsPerPage + 1} to{" "}
+                          {Math.min(
+                            currentAccountPage * accountsPerPage,
+                            filteredAccounts.length
+                          )}{" "}
+                          of {filteredAccounts.length} accounts
+                        </span>
+                      </div>
+                      <div className="pagination-numbers">
+                        {currentAccountPage > 1 && (
+                          <button
+                            className="pagination-arrow"
+                            onClick={() =>
+                              handleAccountPageChange(currentAccountPage - 1)
+                            }
+                          >
+                            ‹
+                          </button>
+                        )}
+
+                        {Array.from(
+                          { length: totalAccountPages },
+                          (_, i) => i + 1
+                        ).map((pageNumber) => {
+                          // Show first page, last page, current page, and pages around current
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === totalAccountPages ||
+                            (pageNumber >= currentAccountPage - 1 &&
+                              pageNumber <= currentAccountPage + 1)
+                          ) {
+                            return (
+                              <button
+                                key={pageNumber}
+                                className={`pagination-number ${
+                                  currentAccountPage === pageNumber
+                                    ? "active"
+                                    : ""
+                                }`}
+                                onClick={() =>
+                                  handleAccountPageChange(pageNumber)
+                                }
+                              >
+                                {pageNumber}
+                              </button>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        {currentAccountPage < totalAccountPages && (
+                          <button
+                            className="pagination-arrow"
+                            onClick={() =>
+                              handleAccountPageChange(currentAccountPage + 1)
+                            }
+                          >
+                            ›
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
           </>
@@ -853,121 +914,6 @@ function FinanceBoard({ subTab }: Readonly<FinanceBoardProps>) {
           </>
         )}
       </div>
-
-      {/* Transaction Modal */}
-      {showTransactionModal && selectedAccount && (
-        <div className="modal-overlay" onClick={closeTransactionModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>
-                Transactions - {selectedAccount.AccountName} (
-                {selectedAccount.Currency})
-              </h2>
-              <button
-                className="modal-close-button"
-                onClick={closeTransactionModal}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="modal-body">
-              {isLoadingTransactions && (
-                <div className="loading-state">
-                  <div className="loading-spinner"></div>
-                  <p>Loading transactions...</p>
-                </div>
-              )}
-
-              {transactionsError && (
-                <div className="empty-state error-state">
-                  <div className="empty-icon">⚠️</div>
-                  <h3>Error Loading Transactions</h3>
-                  <p>{transactionsError}</p>
-                </div>
-              )}
-
-              {!isLoadingTransactions &&
-                !transactionsError &&
-                accountTransactions.length === 0 && (
-                  <div className="empty-state">
-                    <div className="empty-icon">📊</div>
-                    <h3>No Transactions Found</h3>
-                    <p>No transactions found for this account</p>
-                  </div>
-                )}
-
-              {!isLoadingTransactions &&
-                !transactionsError &&
-                accountTransactions.length > 0 && (
-                  <div className="transactions-table-wrapper">
-                    <table className="transactions-table">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Description</th>
-                          <th>Amount</th>
-                          <th>Type</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {accountTransactions.map((transaction) => (
-                          <tr key={transaction.Id}>
-                            <td className="date-cell">
-                              {new Date(transaction.TxnDate).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                }
-                              )}
-                            </td>
-                            <td className="description-cell">
-                              {transaction.Description}
-                            </td>
-                            <td
-                              className={`amount-cell ${
-                                transaction.isDebit ? "negative" : "positive"
-                              }`}
-                            >
-                              {transaction.Currency === "AED" ? (
-                                <>
-                                  <span className="dirham-symbol">ê</span>
-                                  {transaction.Amount.toLocaleString("en-US", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
-                                </>
-                              ) : (
-                                `₹ ${transaction.Amount.toLocaleString(
-                                  "en-IN",
-                                  {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  }
-                                )}`
-                              )}
-                            </td>
-                            <td className="type-cell">
-                              <span
-                                className={`transaction-type-badge ${
-                                  transaction.isDebit ? "debit" : "credit"
-                                }`}
-                              >
-                                {transaction.isDebit ? "Debit" : "Credit"}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
